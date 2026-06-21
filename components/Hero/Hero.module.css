@@ -1,0 +1,475 @@
+/* ============================================
+   🏠 Hero Section Styles
+   ============================================ */
+
+.hero {
+  min-height: calc(100vh - 70px);
+  background: var(--gradient-hero);
+  display: flex;
+  align-items: center;
+  position: relative;
+  overflow: hidden;
+  padding: 3rem 0;
+}
+
+.heroInner {
+  max-width: var(--container-max);
+  margin: 0 auto;
+  padding: 0 var(--container-padding);
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 4rem;
+  align-items: center;
+  width: 100%;
+}
+
+/* --- Left Content --- */
+.heroContent {
+  animation: heroFadeInUp 0.8s ease forwards;
+  position: relative;
+  z-index: 2;
+}
+
+.badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-family: 'Inter', sans-serif;
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: var(--accent);
+  background: var(--accent-soft);
+  border: 1px solid var(--accent-glow);
+  padding: 0.45rem 1.1rem;
+  border-radius: var(--radius-full);
+  margin-bottom: 1.5rem;
+  letter-spacing: 0.02em;
+}
+
+.badgeDot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: var(--accent);
+  animation: pulse 2s ease infinite;
+}
+
+.heading {
+  display: flex;
+  flex-direction: column;
+  gap: 0.15rem;
+  margin-bottom: 1.5rem;
+  line-height: 1.1;
+}
+
+.headingLine1 {
+  font-family: 'Outfit', sans-serif;
+  font-size: clamp(2.2rem, 5vw, 3.8rem);
+  font-weight: 800;
+  color: var(--text-primary);
+  letter-spacing: -0.03em;
+}
+
+.headingLine2 {
+  font-family: 'Outfit', sans-serif;
+  font-size: clamp(2.2rem, 5vw, 3.8rem);
+  font-weight: 800;
+  color: var(--accent);
+  letter-spacing: -0.03em;
+}
+
+.subtext {
+  font-size: 1.15rem;
+  color: var(--text-secondary);
+  line-height: 1.7;
+  max-width: 520px;
+  margin-bottom: 2rem;
+}
+
+/* --- Inline Search Bar --- */
+.searchBar {
+  display: flex;
+  align-items: stretch;
+  gap: 0.75rem;
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  padding: 0.5rem;
+  box-shadow: var(--shadow-lg);
+  margin-bottom: 2rem;
+  max-width: 580px;
+}
+
+.selectWrapper {
+  position: relative;
+  flex: 1;
+  min-width: 0;
+}
+
+.select {
+  width: 100%;
+  padding: 0.75rem 2rem 0.75rem 1rem;
+  background: var(--bg-secondary);
+  border: 1px solid transparent;
+  border-radius: var(--radius);
+  color: var(--text-primary);
+  font-size: 0.9rem;
+  font-weight: 500;
+  cursor: pointer;
+  appearance: none;
+  -webkit-appearance: none;
+  transition: var(--transition-fast);
+}
+
+.select:focus {
+  border-color: var(--accent);
+  box-shadow: 0 0 0 3px var(--accent-glow);
+  background: var(--bg-card);
+}
+
+.selectIcon {
+  position: absolute;
+  right: 0.75rem;
+  top: 50%;
+  transform: translateY(-50%);
+  pointer-events: none;
+  color: var(--text-muted);
+  display: flex;
+  align-items: center;
+}
+
+.searchBtn {
+  flex-shrink: 0;
+  border-radius: var(--radius) !important;
+  padding: 0.75rem 1.5rem !important;
+  font-size: 0.9rem !important;
+  white-space: nowrap;
+}
+
+/* --- Hero Meta --- */
+.heroMeta {
+  display: flex;
+  align-items: center;
+  gap: 1.5rem;
+  flex-wrap: wrap;
+}
+
+.metaItem {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  font-size: 0.85rem;
+  font-weight: 500;
+  color: var(--text-muted);
+}
+
+.metaIcon {
+  font-size: 0.95rem;
+}
+
+/* --- Right Visual: Blood Drop --- */
+.heroVisual {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+  animation: heroFadeIn 1s ease 0.3s forwards;
+  opacity: 0;
+}
+
+.bloodDropLarge {
+  width: 280px;
+  height: 350px;
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.dropInner {
+  width: 200px;
+  height: 260px;
+  background: var(--gradient-accent);
+  border-radius: 50% 50% 50% 50% / 30% 30% 70% 70%;
+  position: relative;
+  box-shadow:
+    0 20px 60px rgba(220, 53, 69, 0.3),
+    0 10px 30px rgba(220, 53, 69, 0.2),
+    inset 0 -10px 30px rgba(0, 0, 0, 0.1);
+  animation: dropFloat 4s ease-in-out infinite;
+}
+
+.dropHighlight {
+  position: absolute;
+  top: 20%;
+  left: 25%;
+  width: 35%;
+  height: 25%;
+  background: rgba(255, 255, 255, 0.25);
+  border-radius: 50%;
+  filter: blur(8px);
+}
+
+.dropPulse,
+.dropPulse2 {
+  position: absolute;
+  inset: -20px;
+  border-radius: 50% 50% 50% 50% / 30% 30% 70% 70%;
+  border: 2px solid var(--accent);
+  opacity: 0;
+  animation: dropPulseAnim 3s ease-out infinite;
+}
+
+.dropPulse2 {
+  animation-delay: 1.5s;
+}
+
+/* --- Orbiting Blood Types --- */
+.orbit {
+  position: absolute;
+  inset: -30px;
+  animation: orbitSpin 20s linear infinite;
+}
+
+.orbitDot {
+  position: absolute;
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  background: var(--bg-card);
+  border: 2px solid var(--border);
+  box-shadow: var(--shadow-md);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: 'Outfit', sans-serif;
+  font-size: 0.75rem;
+  font-weight: 700;
+  color: var(--accent);
+  animation: orbitCounterSpin 20s linear infinite;
+}
+
+.orbitDot:nth-child(1) {
+  top: 0;
+  left: 50%;
+  transform: translateX(-50%);
+}
+
+.orbitDot:nth-child(2) {
+  top: 50%;
+  right: -22px;
+  transform: translateY(-50%);
+}
+
+.orbitDot:nth-child(3) {
+  bottom: 0;
+  left: 50%;
+  transform: translateX(-50%);
+}
+
+.orbitDot:nth-child(4) {
+  top: 50%;
+  left: -22px;
+  transform: translateY(-50%);
+}
+
+/* --- Floating Background Drops --- */
+.floatingDrops {
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+  pointer-events: none;
+  z-index: 0;
+}
+
+.drop {
+  position: absolute;
+  width: 20px;
+  height: 26px;
+  background: var(--accent);
+  border-radius: 50% 50% 50% 50% / 30% 30% 70% 70%;
+  opacity: 0;
+}
+
+.drop1 {
+  top: 15%;
+  left: 10%;
+  animation: dropBounce 8s ease-in-out 0s infinite;
+  opacity: 0.06;
+  width: 16px;
+  height: 22px;
+}
+
+.drop2 {
+  top: 60%;
+  left: 80%;
+  animation: dropBounce 10s ease-in-out 2s infinite;
+  opacity: 0.05;
+  width: 12px;
+  height: 16px;
+}
+
+.drop3 {
+  top: 30%;
+  right: 15%;
+  animation: dropBounce 12s ease-in-out 4s infinite;
+  opacity: 0.04;
+  width: 24px;
+  height: 32px;
+}
+
+.drop4 {
+  bottom: 20%;
+  left: 20%;
+  animation: dropBounce 9s ease-in-out 1s infinite;
+  opacity: 0.05;
+  width: 14px;
+  height: 18px;
+}
+
+.drop5 {
+  top: 70%;
+  left: 55%;
+  animation: dropBounce 11s ease-in-out 3s infinite;
+  opacity: 0.04;
+  width: 18px;
+  height: 24px;
+}
+
+/* --- Animations --- */
+@keyframes heroFadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(40px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes heroFadeIn {
+  from {
+    opacity: 0;
+    transform: scale(0.9);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+@keyframes dropFloat {
+  0%, 100% {
+    transform: translateY(0px);
+  }
+  50% {
+    transform: translateY(-15px);
+  }
+}
+
+@keyframes dropPulseAnim {
+  0% {
+    transform: scale(1);
+    opacity: 0.5;
+  }
+  100% {
+    transform: scale(1.5);
+    opacity: 0;
+  }
+}
+
+@keyframes orbitSpin {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
+
+@keyframes orbitCounterSpin {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(-360deg); }
+}
+
+@keyframes dropBounce {
+  0% { transform: translateY(-100vh) rotate(0deg); opacity: 0; }
+  60% { transform: translateY(10px) rotate(180deg); opacity: 0.08; }
+  80% { transform: translateY(-5px) rotate(270deg); opacity: 0.05; }
+  100% { transform: translateY(100vh) rotate(360deg); opacity: 0; }
+}
+
+@keyframes pulse {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.4; }
+}
+
+/* --- Responsive --- */
+@media (max-width: 1024px) {
+  .heroInner {
+    grid-template-columns: 1fr;
+    gap: 3rem;
+    text-align: center;
+  }
+
+  .heroContent {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+  }
+
+  .subtext {
+    margin-left: auto;
+    margin-right: auto;
+  }
+
+  .searchBar {
+    margin-left: auto;
+    margin-right: auto;
+    max-width: 100%;
+  }
+
+  .heroMeta {
+    justify-content: center;
+  }
+
+  .heroVisual {
+    order: -1;
+  }
+
+  .bloodDropLarge {
+    width: 200px;
+    height: 260px;
+  }
+
+  .dropInner {
+    width: 140px;
+    height: 190px;
+  }
+}
+
+@media (max-width: 640px) {
+  .hero {
+    min-height: auto;
+    padding: 2rem 0 3rem;
+  }
+
+  .searchBar {
+    flex-direction: column;
+    gap: 0.5rem;
+    padding: 0.75rem;
+  }
+
+  .searchBtn {
+    width: 100%;
+  }
+
+  .heroVisual {
+    display: none;
+  }
+
+  .heading {
+    gap: 0;
+  }
+
+  .heroMeta {
+    gap: 1rem;
+  }
+}
