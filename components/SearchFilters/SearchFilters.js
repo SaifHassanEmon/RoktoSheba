@@ -1,15 +1,55 @@
 'use client';
 
+import { useState, useEffect } from 'react';
 import styles from './SearchFilters.module.css';
-import { BLOOD_GROUPS, DHAKA_AREAS } from '@/data/seedDonors';
+import { BLOOD_GROUPS } from '@/data/seedDonors';
+import { BANGLADESH_DATA } from '@/data/bangladeshData';
 
 const ALL_GROUPS = ['All', ...BLOOD_GROUPS];
 
 export default function SearchFilters({ filters, onFilterChange }) {
+  const [districtsList, setDistrictsList] = useState([]);
+  const [areasList, setAreasList] = useState([]);
+
+  // Sync list of districts and areas when filters change
+  useEffect(() => {
+    const div = filters.division;
+    const dist = filters.district;
+
+    if (div && div !== 'all' && BANGLADESH_DATA[div]) {
+      setDistrictsList(Object.keys(BANGLADESH_DATA[div].districts));
+      if (dist && dist !== 'all' && BANGLADESH_DATA[div].districts[dist]) {
+        setAreasList(BANGLADESH_DATA[div].districts[dist]);
+      } else {
+        setAreasList([]);
+      }
+    } else {
+      setDistrictsList([]);
+      setAreasList([]);
+    }
+  }, [filters.division, filters.district]);
+
   const handleBloodGroup = (group) => {
     onFilterChange({
       ...filters,
       bloodGroup: group === 'All' ? 'all' : group,
+    });
+  };
+
+  const handleDivision = (e) => {
+    onFilterChange({
+      ...filters,
+      division: e.target.value,
+      district: 'all',
+      area: 'all',
+    });
+  };
+
+  const handleDistrict = (e) => {
+    onFilterChange({
+      ...filters,
+      district: e.target.value,
+      area: 'all',
     });
   };
 
@@ -30,6 +70,8 @@ export default function SearchFilters({ filters, onFilterChange }) {
   const clearAll = () => {
     onFilterChange({
       bloodGroup: 'all',
+      division: 'all',
+      district: 'all',
       area: 'all',
       availableOnly: false,
       eligibleOnly: false,
@@ -41,8 +83,14 @@ export default function SearchFilters({ filters, onFilterChange }) {
   if (filters.bloodGroup && filters.bloodGroup !== 'all') {
     activeChips.push({ label: filters.bloodGroup, key: 'bloodGroup' });
   }
+  if (filters.division && filters.division !== 'all') {
+    activeChips.push({ label: `Division: ${filters.division}`, key: 'division' });
+  }
+  if (filters.district && filters.district !== 'all') {
+    activeChips.push({ label: `District: ${filters.district}`, key: 'district' });
+  }
   if (filters.area && filters.area !== 'all') {
-    activeChips.push({ label: filters.area, key: 'area' });
+    activeChips.push({ label: `Area: ${filters.area}`, key: 'area' });
   }
   if (filters.availableOnly) {
     activeChips.push({ label: 'Available Only', key: 'availableOnly' });
@@ -52,9 +100,17 @@ export default function SearchFilters({ filters, onFilterChange }) {
   }
 
   const removeChip = (key) => {
-    if (key === 'bloodGroup') onFilterChange({ ...filters, bloodGroup: 'all' });
-    else if (key === 'area') onFilterChange({ ...filters, area: 'all' });
-    else onFilterChange({ ...filters, [key]: false });
+    if (key === 'bloodGroup') {
+      onFilterChange({ ...filters, bloodGroup: 'all' });
+    } else if (key === 'division') {
+      onFilterChange({ ...filters, division: 'all', district: 'all', area: 'all' });
+    } else if (key === 'district') {
+      onFilterChange({ ...filters, district: 'all', area: 'all' });
+    } else if (key === 'area') {
+      onFilterChange({ ...filters, area: 'all' });
+    } else {
+      onFilterChange({ ...filters, [key]: false });
+    }
   };
 
   return (
@@ -81,21 +137,60 @@ export default function SearchFilters({ filters, onFilterChange }) {
         </div>
       </div>
 
-      {/* Area dropdown */}
-      <div className={styles.filterGroup}>
-        <label className={styles.filterLabel}>Area</label>
-        <select
-          className={styles.select}
-          value={filters.area || 'all'}
-          onChange={handleArea}
-        >
-          <option value="all">All Areas</option>
-          {DHAKA_AREAS.map((area) => (
-            <option key={area} value={area}>
-              {area}
-            </option>
-          ))}
-        </select>
+      {/* Chained location dropdowns */}
+      <div className={styles.locationGroup}>
+        {/* Division Dropdown */}
+        <div className={styles.filterGroup}>
+          <label className={styles.filterLabel}>Division</label>
+          <select
+            className={styles.select}
+            value={filters.division || 'all'}
+            onChange={handleDivision}
+          >
+            <option value="all">All Divisions</option>
+            {Object.keys(BANGLADESH_DATA).map((div) => (
+              <option key={div} value={div}>
+                {div}
+              </option>
+            ))}
+          </select>
+        </div>
+
+        {/* District Dropdown */}
+        <div className={styles.filterGroup}>
+          <label className={styles.filterLabel}>District</label>
+          <select
+            className={styles.select}
+            value={filters.district || 'all'}
+            onChange={handleDistrict}
+            disabled={!filters.division || filters.division === 'all'}
+          >
+            <option value="all">All Districts</option>
+            {districtsList.map((dist) => (
+              <option key={dist} value={dist}>
+                {dist}
+              </option>
+            ))}
+          </select>
+        </div>
+
+        {/* Area Dropdown */}
+        <div className={styles.filterGroup}>
+          <label className={styles.filterLabel}>Area</label>
+          <select
+            className={styles.select}
+            value={filters.area || 'all'}
+            onChange={handleArea}
+            disabled={!filters.district || filters.district === 'all'}
+          >
+            <option value="all">All Areas</option>
+            {areasList.map((area) => (
+              <option key={area} value={area}>
+                {area}
+              </option>
+            ))}
+          </select>
+        </div>
       </div>
 
       {/* Toggles */}

@@ -15,6 +15,8 @@ function SearchContent() {
   const [compatOpen, setCompatOpen] = useState(false);
   const [filters, setFilters] = useState({
     bloodGroup: 'all',
+    division: 'all',
+    district: 'all',
     area: 'all',
     availableOnly: false,
     eligibleOnly: false,
@@ -28,8 +30,17 @@ function SearchContent() {
     const fetchInitialData = async () => {
       setLoading(true);
       const bg = searchParams.get('bloodGroup') || 'all';
+      const div = searchParams.get('division') || 'all';
+      const dist = searchParams.get('district') || 'all';
       const area = searchParams.get('area') || 'all';
-      const initial = { bloodGroup: bg, area, availableOnly: false, eligibleOnly: false };
+      const initial = { 
+        bloodGroup: bg, 
+        division: div, 
+        district: dist, 
+        area, 
+        availableOnly: false, 
+        eligibleOnly: false 
+      };
       setFilters(initial);
       
       let results = await getDonors(initial);

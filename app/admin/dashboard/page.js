@@ -14,7 +14,8 @@ import {
 import { db } from '@/lib/firebase';
 import Navbar from '@/components/Navbar/Navbar';
 import Footer from '@/components/Footer/Footer';
-import { BLOOD_GROUPS, DHAKA_AREAS } from '@/data/seedDonors';
+import { BLOOD_GROUPS } from '@/data/seedDonors';
+import { BANGLADESH_DATA } from '@/data/bangladeshData';
 import styles from './page.module.css';
 
 export default function AdminDashboardPage() {
@@ -28,6 +29,8 @@ export default function AdminDashboardPage() {
   // Search & Filter State
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedGroup, setSelectedGroup] = useState('all');
+  const [selectedDivision, setSelectedDivision] = useState('all');
+  const [selectedDistrict, setSelectedDistrict] = useState('all');
   const [selectedArea, setSelectedArea] = useState('all');
   const [selectedAvailability, setSelectedAvailability] = useState('all');
 
@@ -35,16 +38,25 @@ export default function AdminDashboardPage() {
   const [modalOpen, setModalOpen] = useState(false);
   const [modalMode, setModalMode] = useState('add'); // 'add' or 'edit'
   const [currentDonor, setCurrentDonor] = useState(null);
+  
   const [formData, setFormData] = useState({
     name: '',
     email: '',
     phone: '',
     bloodGroup: '',
+    division: '',
+    district: '',
     area: '',
     totalDonations: 0,
     lastDonation: '',
     available: true
   });
+
+  const [modalDistricts, setModalDistricts] = useState([]);
+  const [modalAreas, setModalAreas] = useState([]);
+  const [modalAvailabilityOption, setModalAvailabilityOption] = useState('primary'); // 'primary', 'multiple', 'all_district'
+  const [modalSelectedAreas, setModalSelectedAreas] = useState([]); // Array of areas from checkboxes
+
   const [modalError, setModalError] = useState('');
   const [saving, setSaving] = useState(false);
 
@@ -67,7 +79,6 @@ export default function AdminDashboardPage() {
         id: doc.id,
         ...doc.data()
       }));
-      // Sort donors by name alphabetically
       donorsList.sort((a, b) => (a.name || '').localeCompare(b.name || ''));
       setDonors(donorsList);
     } catch (err) {
@@ -99,7 +110,6 @@ export default function AdminDashboardPage() {
         available: !currentStatus
       });
       
-      // Update local state
       setDonors(prev => prev.map(d => 
         d.id === donorId ? { ...d, available: !currentStatus } : d
       ));
@@ -128,18 +138,51 @@ export default function AdminDashboardPage() {
   const openModal = (mode, donor = null) => {
     setModalMode(mode);
     setModalError('');
+    
     if (mode === 'edit' && donor) {
       setCurrentDonor(donor);
+      
+      const div = donor.division || '';
+      const dist = donor.district || '';
+      const ar = donor.area || '';
+      const listAreas = donor.areas || (ar ? [ar] : []);
+      
       setFormData({
         name: donor.name || '',
         email: donor.email || '',
         phone: donor.phone || '',
         bloodGroup: donor.bloodGroup || '',
-        area: donor.area || '',
+        division: div,
+        district: dist,
+        area: ar,
         totalDonations: donor.totalDonations || 0,
         lastDonation: donor.lastDonation || '',
         available: donor.available !== undefined ? donor.available : true
       });
+
+      // Populate dropdown lists
+      if (div && BANGLADESH_DATA[div]) {
+        setModalDistricts(Object.keys(BANGLADESH_DATA[div].districts));
+        if (dist && BANGLADESH_DATA[div].districts[dist]) {
+          setModalAreas(BANGLADESH_DATA[div].districts[dist]);
+        } else {
+          setModalAreas([]);
+        }
+      } else {
+        setModalDistricts([]);
+        setModalAreas([]);
+      }
+
+      // Populate multi-area configurations
+      setModalSelectedAreas(listAreas);
+      if (donor.availableAllAreas) {
+        setModalAvailabilityOption('all_district');
+      } else if (listAreas.length > 1) {
+        setModalAvailabilityOption('multiple');
+      } else {
+        setModalAvailabilityOption('primary');
+      }
+
     } else {
       setCurrentDonor(null);
       setFormData({
@@ -147,11 +190,17 @@ export default function AdminDashboardPage() {
         email: '',
         phone: '',
         bloodGroup: '',
+        division: '',
+        district: '',
         area: '',
         totalDonations: 0,
         lastDonation: '',
         available: true
       });
+      setModalDistricts([]);
+      setModalAreas([]);
+      setModalSelectedAreas([]);
+      setModalAvailabilityOption('primary');
     }
     setModalOpen(true);
   };
@@ -165,33 +214,97 @@ export default function AdminDashboardPage() {
     }));
   };
 
+  // Chained dropdown selections inside modal
+  const handleModalDivisionChange = (e) => {
+    const div = e.target.value;
+    setFormData(prev => ({ ...prev, division: div, district: '', area: '' }));
+    if (div && BANGLADESH_DATA[div]) {
+      setModalDistricts(Object.keys(BANGLADESH_DATA[div].districts));
+    } else {
+      setModalDistricts([]);
+    }
+    setModalAreas([]);
+    setModalSelectedAreas([]);
+  };
+
+  const handleModalDistrictChange = (e) => {
+    const dist = e.target.value;
+    setFormData(prev => ({ ...prev, district: dist, area: '' }));
+    if (dist && formData.division && BANGLADESH_DATA[formData.division].districts[dist]) {
+      setModalAreas(BANGLADESH_DATA[formData.division].districts[dist]);
+    } else {
+      setModalAreas([]);
+    }
+    setModalSelectedAreas([]);
+  };
+
+  const handleModalAreaChange = (e) => {
+    const ar = e.target.value;
+    setFormData(prev => ({ ...prev, area: ar }));
+    if (modalAvailabilityOption === 'primary') {
+      setModalSelectedAreas([ar]);
+    } else if (modalAvailabilityOption === 'multiple') {
+      setModalSelectedAreas(prev => prev.includes(ar) ? prev : [...prev, ar]);
+    }
+  };
+
+  const handleModalAvailabilityOptionChange = (option) => {
+    setModalAvailabilityOption(option);
+    if (option === 'primary') {
+      setModalSelectedAreas(formData.area ? [formData.area] : []);
+    } else if (option === 'all_district') {
+      setModalSelectedAreas(modalAreas);
+    } else {
+      setModalSelectedAreas(formData.area ? [formData.area] : []);
+    }
+  };
+
+  const handleModalAreaCheckboxChange = (areaName, checked) => {
+    if (checked) {
+      setModalSelectedAreas(prev => [...prev, areaName]);
+    } else {
+      setModalSelectedAreas(prev => prev.filter(a => a !== areaName));
+    }
+  };
+
   // Save Modal (Create / Update)
   const handleSaveDonor = async (e) => {
     e.preventDefault();
     setModalError('');
     setSaving(true);
 
-    // Basic Validation
-    if (!formData.name || !formData.phone || !formData.bloodGroup || !formData.area) {
+    if (!formData.name || !formData.phone || !formData.bloodGroup || !formData.division || !formData.district || !formData.area) {
       setModalError('Please fill in all required fields.');
       setSaving(false);
       return;
     }
 
+    // Calculate final areas array
+    let finalAreas = [];
+    if (modalAvailabilityOption === 'primary') {
+      finalAreas = [formData.area];
+    } else if (modalAvailabilityOption === 'all_district') {
+      finalAreas = modalAreas;
+    } else {
+      finalAreas = Array.from(new Set([formData.area, ...modalSelectedAreas])).filter(Boolean);
+    }
+
     try {
       if (modalMode === 'edit' && currentDonor) {
-        // Edit flow
         const donorRef = doc(db, 'donors', currentDonor.id);
         const updateData = {
           name: formData.name,
           phone: formData.phone,
           bloodGroup: formData.bloodGroup,
+          division: formData.division,
+          district: formData.district,
           area: formData.area,
+          areas: finalAreas,
+          availableAllAreas: modalAvailabilityOption === 'all_district',
           totalDonations: parseInt(formData.totalDonations) || 0,
           lastDonation: formData.lastDonation || null,
           available: formData.available
         };
-        // Add email if provided
         if (formData.email) updateData.email = formData.email;
 
         await updateDoc(donorRef, updateData);
@@ -201,15 +314,17 @@ export default function AdminDashboardPage() {
         ));
         showToast('Donor profile updated successfully.');
       } else {
-        // Add flow
         const collectionRef = collection(db, 'donors');
         const newData = {
           name: formData.name,
           email: formData.email || '',
           phone: formData.phone,
           bloodGroup: formData.bloodGroup,
+          division: formData.division,
+          district: formData.district,
           area: formData.area,
-          district: 'Dhaka',
+          areas: finalAreas,
+          availableAllAreas: modalAvailabilityOption === 'all_district',
           totalDonations: parseInt(formData.totalDonations) || 0,
           lastDonation: formData.lastDonation || null,
           available: formData.available,
@@ -239,24 +354,27 @@ export default function AdminDashboardPage() {
 
   // Filtered Donors List
   const filteredDonors = donors.filter(donor => {
-    // Search Filter
     const searchMatch = 
       (donor.name || '').toLowerCase().includes(searchQuery.toLowerCase()) ||
       (donor.phone || '').toLowerCase().includes(searchQuery.toLowerCase());
     
-    // Blood Group Filter
     const groupMatch = selectedGroup === 'all' || donor.bloodGroup === selectedGroup;
     
-    // Area Filter
-    const areaMatch = selectedArea === 'all' || donor.area === selectedArea;
+    const divisionMatch = selectedDivision === 'all' || donor.division === selectedDivision;
+    
+    const districtMatch = selectedDistrict === 'all' || donor.district === selectedDistrict;
 
-    // Availability Filter
+    // Match area - supports both legacy string and new array-of-areas
+    const areaMatch = selectedArea === 'all' || 
+      donor.area === selectedArea || 
+      (Array.isArray(donor.areas) && donor.areas.includes(selectedArea));
+
     const availabilityMatch = 
       selectedAvailability === 'all' || 
       (selectedAvailability === 'available' && donor.available) ||
       (selectedAvailability === 'unavailable' && !donor.available);
 
-    return searchMatch && groupMatch && areaMatch && availabilityMatch;
+    return searchMatch && groupMatch && divisionMatch && districtMatch && areaMatch && availabilityMatch;
   });
 
   if (authLoading || !user || !isAdmin) {
@@ -278,7 +396,6 @@ export default function AdminDashboardPage() {
     <>
       <Navbar />
       
-      {/* Toast Notification */}
       {toast.show && (
         <div className={`${styles.toast} ${styles[toast.type]}`}>
           {toast.type === 'success' ? '✅' : '❌'} {toast.message}
@@ -339,7 +456,7 @@ export default function AdminDashboardPage() {
               <div className={styles.statIcon}>📍</div>
               <div className={styles.statDetails}>
                 <h3>{totalAreas}</h3>
-                <p>Areas in Dhaka</p>
+                <p>Areas Covered</p>
               </div>
             </div>
           </section>
@@ -372,15 +489,50 @@ export default function AdminDashboardPage() {
                 </div>
 
                 <div className={styles.selectWrapper}>
+                  <label htmlFor="filterDivision">Division</label>
+                  <select 
+                    id="filterDivision"
+                    value={selectedDivision} 
+                    onChange={(e) => {
+                      setSelectedDivision(e.target.value);
+                      setSelectedDistrict('all');
+                      setSelectedArea('all');
+                    }}
+                    className={styles.selectInput}
+                  >
+                    <option value="all">All Divisions</option>
+                    {Object.keys(BANGLADESH_DATA).map(div => <option key={div} value={div}>{div}</option>)}
+                  </select>
+                </div>
+
+                <div className={styles.selectWrapper}>
+                  <label htmlFor="filterDistrict">District</label>
+                  <select 
+                    id="filterDistrict"
+                    value={selectedDistrict} 
+                    onChange={(e) => {
+                      setSelectedDistrict(e.target.value);
+                      setSelectedArea('all');
+                    }}
+                    className={styles.selectInput}
+                    disabled={selectedDivision === 'all'}
+                  >
+                    <option value="all">All Districts</option>
+                    {selectedDivision !== 'all' && Object.keys(BANGLADESH_DATA[selectedDivision].districts).map(dist => <option key={dist} value={dist}>{dist}</option>)}
+                  </select>
+                </div>
+
+                <div className={styles.selectWrapper}>
                   <label htmlFor="filterArea">Area</label>
                   <select 
                     id="filterArea"
                     value={selectedArea} 
                     onChange={(e) => setSelectedArea(e.target.value)}
                     className={styles.selectInput}
+                    disabled={selectedDistrict === 'all'}
                   >
                     <option value="all">All Areas</option>
-                    {DHAKA_AREAS.map(a => <option key={a} value={a}>{a}</option>)}
+                    {selectedDivision !== 'all' && selectedDistrict !== 'all' && BANGLADESH_DATA[selectedDivision].districts[selectedDistrict].map(a => <option key={a} value={a}>{a}</option>)}
                   </select>
                 </div>
 
@@ -418,7 +570,7 @@ export default function AdminDashboardPage() {
                       <th>Name</th>
                       <th>Group</th>
                       <th>Phone</th>
-                      <th>Area</th>
+                      <th>District / Area</th>
                       <th>Total Donations</th>
                       <th>Last Donation</th>
                       <th>Available</th>
@@ -438,7 +590,16 @@ export default function AdminDashboardPage() {
                           <span className={`badge badge-accent`}>{donor.bloodGroup}</span>
                         </td>
                         <td className={styles.phoneCell}>{donor.phone}</td>
-                        <td>{donor.area}</td>
+                        <td>
+                          <div className={styles.donorInfo}>
+                            <span>{donor.district || 'Dhaka'}</span>
+                            <span className={styles.donorEmail}>
+                              {donor.areas && donor.areas.length > 1 
+                                ? `${donor.area} (${donor.areas.length} areas)` 
+                                : donor.area || 'N/A'}
+                            </span>
+                          </div>
+                        </td>
                         <td className={styles.centerText}>{donor.totalDonations || 0}</td>
                         <td>{donor.lastDonation || 'N/A'}</td>
                         <td>
@@ -548,17 +709,48 @@ export default function AdminDashboardPage() {
                   </select>
                 </div>
 
+                {/* Chained Location Dropdowns */}
                 <div className={styles.formGroup}>
-                  <label htmlFor="donorArea">Area in Dhaka *</label>
+                  <label htmlFor="donorDivision">Division *</label>
+                  <select 
+                    id="donorDivision"
+                    name="division" 
+                    value={formData.division} 
+                    onChange={handleModalDivisionChange}
+                    required
+                  >
+                    <option value="" disabled>Select Division</option>
+                    {Object.keys(BANGLADESH_DATA).map(div => <option key={div} value={div}>{div}</option>)}
+                  </select>
+                </div>
+
+                <div className={styles.formGroup}>
+                  <label htmlFor="donorDistrict">District *</label>
+                  <select 
+                    id="donorDistrict"
+                    name="district" 
+                    value={formData.district} 
+                    onChange={handleModalDistrictChange}
+                    disabled={!formData.division}
+                    required
+                  >
+                    <option value="" disabled>Select District</option>
+                    {modalDistricts.map(dist => <option key={dist} value={dist}>{dist}</option>)}
+                  </select>
+                </div>
+
+                <div className={styles.formGroup}>
+                  <label htmlFor="donorArea">Primary Residential Area *</label>
                   <select 
                     id="donorArea"
                     name="area" 
                     value={formData.area} 
-                    onChange={handleFormChange}
+                    onChange={handleModalAreaChange}
+                    disabled={!formData.district}
                     required
                   >
                     <option value="" disabled>Select Area</option>
-                    {DHAKA_AREAS.map(a => <option key={a} value={a}>{a}</option>)}
+                    {modalAreas.map(a => <option key={a} value={a}>{a}</option>)}
                   </select>
                 </div>
 
@@ -598,6 +790,60 @@ export default function AdminDashboardPage() {
                   </label>
                 </div>
               </div>
+
+              {/* Multiple Areas of Availability */}
+              {formData.area && (
+                <div style={{ marginTop: '1rem', borderTop: '1px solid var(--border-light)', paddingTop: '1rem', gridColumn: '1 / -1' }}>
+                  <label className={styles.toggleLabel} style={{ fontWeight: 600, fontSize: '0.9rem', marginBottom: '0.5rem', display: 'block' }}>
+                    Areas of Availability to Donate
+                  </label>
+                  <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem', marginBottom: '1rem' }}>
+                    <label style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', fontSize: '0.85rem', cursor: 'pointer' }}>
+                      <input
+                        type="radio"
+                        name="modalAvailabilityOption"
+                        checked={modalAvailabilityOption === 'primary'}
+                        onChange={() => handleModalAvailabilityOptionChange('primary')}
+                      />
+                      <span>My primary area only ({formData.area})</span>
+                    </label>
+                    <label style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', fontSize: '0.85rem', cursor: 'pointer' }}>
+                      <input
+                        type="radio"
+                        name="modalAvailabilityOption"
+                        checked={modalAvailabilityOption === 'all_district'}
+                        onChange={() => handleModalAvailabilityOptionChange('all_district')}
+                      />
+                      <span>Available in all areas in {formData.district} district</span>
+                    </label>
+                    <label style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', fontSize: '0.85rem', cursor: 'pointer' }}>
+                      <input
+                        type="radio"
+                        name="modalAvailabilityOption"
+                        checked={modalAvailabilityOption === 'multiple'}
+                        onChange={() => handleModalAvailabilityOptionChange('multiple')}
+                      />
+                      <span>Select specific areas (multiple)</span>
+                    </label>
+                  </div>
+
+                  {modalAvailabilityOption === 'multiple' && modalAreas.length > 0 && (
+                    <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(130px, 1fr))', gap: '0.5rem', maxHeight: '120px', overflowY: 'auto', border: '1px solid var(--border)', borderRadius: 'var(--radius)', padding: '0.75rem' }}>
+                      {modalAreas.map((a) => (
+                        <label key={a} style={{ display: 'flex', alignItems: 'center', gap: '0.4rem', fontSize: '0.8rem', cursor: 'pointer' }}>
+                          <input
+                            type="checkbox"
+                            checked={modalSelectedAreas.includes(a) || a === formData.area}
+                            onChange={(e) => handleModalAreaCheckboxChange(a, e.target.checked)}
+                            disabled={a === formData.area}
+                          />
+                          <span>{a}</span>
+                        </label>
+                      ))}
+                    </div>
+                  )}
+                </div>
+              )}
 
               <div className={styles.modalActions}>
                 <button 
