@@ -8,12 +8,14 @@ import { auth, db } from '@/lib/firebase';
 const AuthContext = createContext({
   user: null,
   donorProfile: null,
+  isAdmin: false,
   loading: true,
 });
 
 export function AuthProvider({ children }) {
   const [user, setUser] = useState(null);
   const [donorProfile, setDonorProfile] = useState(null);
+  const [isAdmin, setIsAdmin] = useState(false);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
@@ -27,16 +29,21 @@ export function AuthProvider({ children }) {
           const docSnap = await getDoc(docRef);
           
           if (docSnap.exists()) {
-            setDonorProfile({ id: docSnap.id, ...docSnap.data() });
+            const profileData = docSnap.data();
+            setDonorProfile({ id: docSnap.id, ...profileData });
+            setIsAdmin(profileData.role === 'admin' || firebaseUser.email === 'admin@roktoseba.org');
           } else {
             setDonorProfile(null);
+            setIsAdmin(firebaseUser.email === 'admin@roktoseba.org');
           }
         } catch (error) {
           console.error("Error fetching donor profile:", error);
           setDonorProfile(null);
+          setIsAdmin(firebaseUser.email === 'admin@roktoseba.org');
         }
       } else {
         setDonorProfile(null);
+        setIsAdmin(false);
       }
       
       setLoading(false);
@@ -46,7 +53,7 @@ export function AuthProvider({ children }) {
   }, []);
 
   return (
-    <AuthContext.Provider value={{ user, donorProfile, loading }}>
+    <AuthContext.Provider value={{ user, donorProfile, isAdmin, loading }}>
       {children}
     </AuthContext.Provider>
   );

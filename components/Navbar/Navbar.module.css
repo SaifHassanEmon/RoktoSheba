@@ -274,3 +274,26 @@
     transform: translateY(-3px);
   }
 }
+
+/* --- Admin styling additions --- */
+.adminLink {
+  border: 1px solid var(--accent-glow) !important;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.adminBadge {
+  background: var(--accent);
+  color: var(--text-inverse);
+  font-size: 0.7rem;
+  padding: 0.1rem 0.4rem;
+  border-radius: var(--radius-full);
+  font-weight: 700;
+  text-transform: uppercase;
+}
+
+.mobileAdminCta {
+  border-color: var(--accent) !important;
+  color: var(--accent) !important;
+}

@@ -6,6 +6,7 @@ const quickLinks = [
   { label: 'Find Donors', href: '/search' },
   { label: 'Blood Request', href: '/request' },
   { label: 'About', href: '/about' },
+  { label: 'Admin Portal', href: '/login?tab=admin' },
 ];
 
 const bloodGroups = ['A+', 'A-', 'B+', 'B-', 'O+', 'O-', 'AB+', 'AB-'];

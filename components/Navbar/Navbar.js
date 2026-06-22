@@ -12,7 +12,7 @@ import { useRouter } from 'next/navigation';
 export default function Navbar() {
   const [scrolled, setScrolled] = useState(false);
   const [mobileOpen, setMobileOpen] = useState(false);
-  const { user } = useAuth();
+  const { user, isAdmin } = useAuth();
   const router = useRouter();
 
   useEffect(() => {
@@ -83,7 +83,13 @@ export default function Navbar() {
           <ThemeToggle />
           {user ? (
             <>
-              <Link href="/dashboard" className={styles.navLink}>Dashboard</Link>
+              {isAdmin ? (
+                <Link href="/admin/dashboard" className={`${styles.navLink} ${styles.adminLink}`}>
+                  Admin Dashboard <span className={styles.adminBadge}>Admin</span>
+                </Link>
+              ) : (
+                <Link href="/dashboard" className={styles.navLink}>Dashboard</Link>
+              )}
               <button onClick={handleLogout} className="btn btn-ghost">
                 Logout
               </button>
@@ -140,13 +146,23 @@ export default function Navbar() {
           <ThemeToggle />
           {user ? (
             <>
-              <Link
-                href="/dashboard"
-                className={`btn btn-secondary ${styles.mobileCta}`}
-                onClick={() => setMobileOpen(false)}
-              >
-                Dashboard
-              </Link>
+              {isAdmin ? (
+                <Link
+                  href="/admin/dashboard"
+                  className={`btn btn-secondary ${styles.mobileCta} ${styles.mobileAdminCta}`}
+                  onClick={() => setMobileOpen(false)}
+                >
+                  Admin Dashboard
+                </Link>
+              ) : (
+                <Link
+                  href="/dashboard"
+                  className={`btn btn-secondary ${styles.mobileCta}`}
+                  onClick={() => setMobileOpen(false)}
+                >
+                  Dashboard
+                </Link>
+              )}
               <button
                 onClick={handleLogout}
                 className={`btn btn-ghost ${styles.mobileCta}`}

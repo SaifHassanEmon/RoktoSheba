@@ -163,6 +163,72 @@
   text-decoration: underline;
 }
 
+/* --- Tabs styling --- */
+.tabs {
+  display: flex;
+  background: var(--bg-secondary);
+  padding: 0.25rem;
+  border-radius: var(--radius);
+  margin-bottom: 2rem;
+  border: 1px solid var(--border);
+}
+
+.tab {
+  flex: 1;
+  text-align: center;
+  padding: 0.6rem 0.5rem;
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: var(--text-secondary);
+  border-radius: calc(var(--radius) - 2px);
+  transition: var(--transition-fast);
+  background: transparent;
+  border: none;
+}
+
+.tab:hover {
+  color: var(--text-primary);
+}
+
+.activeTab {
+  background: var(--bg-card);
+  color: var(--accent) !important;
+  box-shadow: var(--shadow);
+}
+
+/* --- Demo admin credentials helper styling --- */
+.demoBox {
+  background: var(--accent-soft);
+  border: 1px dashed var(--accent);
+  padding: 1rem;
+  border-radius: var(--radius);
+  margin-bottom: 1.5rem;
+  text-align: center;
+}
+
+.demoText {
+  font-size: 0.85rem;
+  color: var(--text-primary);
+  font-weight: 500;
+  margin-bottom: 0.5rem;
+}
+
+.demoBtn {
+  width: 100%;
+  padding: 0.5rem;
+  font-size: 0.85rem;
+  font-weight: 600;
+  border-color: var(--accent) !important;
+  color: var(--accent) !important;
+  background: var(--bg-card);
+  transition: var(--transition-fast);
+}
+
+.demoBtn:hover {
+  background: var(--accent) !important;
+  color: var(--text-inverse) !important;
+}
+
 @keyframes spin {
   to { transform: rotate(360deg); }
 }
