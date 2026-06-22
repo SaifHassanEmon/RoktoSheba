@@ -15,8 +15,10 @@ export async function POST(request) {
       await setDoc(donorRef, {
         name: donor.name,
         bloodGroup: donor.bloodGroup,
+        division: donor.division || 'Dhaka', // Default to Dhaka for seed mock data
+        district: donor.district || 'Dhaka',
         area: donor.area,
-        district: donor.district,
+        areas: donor.areas || [donor.area],
         phone: donor.phone,
         lastDonation: donor.lastDonation,
         available: donor.available,
