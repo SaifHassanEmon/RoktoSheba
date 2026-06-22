@@ -59,6 +59,7 @@ export default function AdminDashboardPage() {
 
   const [modalError, setModalError] = useState('');
   const [saving, setSaving] = useState(false);
+  const [syncing, setSyncing] = useState(false);
 
   // Success Feedback Toast
   const [toast, setToast] = useState({ show: false, message: '', type: 'success' });
@@ -86,6 +87,49 @@ export default function AdminDashboardPage() {
       setError('Failed to fetch donors list. Please refresh the page.');
     } finally {
       setLoading(false);
+    }
+  };
+
+  const syncAllToGoogleSheets = async () => {
+    if (donors.length === 0) {
+      showToast('No donors to sync.', 'error');
+      return;
+    }
+    setSyncing(true);
+    try {
+      // Map donors list to sheets representation
+      const formattedDonors = donors.map(donor => ({
+        name: donor.name || "",
+        email: donor.email || "",
+        phone: donor.phone || "",
+        bloodGroup: donor.bloodGroup || "",
+        division: donor.division || "",
+        district: donor.district || "",
+        area: donor.area || "",
+        areas: Array.isArray(donor.areas) ? donor.areas.join(', ') : (donor.area || ""),
+        lastDonation: donor.lastDonation || "N/A",
+        available: donor.available !== undefined ? donor.available : true,
+        totalDonations: donor.totalDonations || 0,
+        createdAt: donor.createdAt ? (donor.createdAt.seconds ? new Date(donor.createdAt.seconds * 1000).toISOString() : donor.createdAt) : new Date().toISOString()
+      }));
+
+      const res = await fetch('/api/sheets', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(formattedDonors)
+      });
+
+      const result = await res.json();
+      if (result.success) {
+        showToast(`Successfully synced ${result.count || donors.length} donors to Google Sheets!`);
+      } else {
+        showToast(result.message || 'Failed to sync. Make sure GOOGLE_SCRIPT_URL is configured in your environment variables.', 'error');
+      }
+    } catch (err) {
+      console.error('Error syncing to Google Sheets:', err);
+      showToast('Failed to sync to Google Sheets. Check console for details.', 'error');
+    } finally {
+      setSyncing(false);
     }
   };
 
@@ -410,12 +454,21 @@ export default function AdminDashboardPage() {
               <h1 className={styles.title}>System Dashboard</h1>
               <p className={styles.subtitle}>Administrative control panel for RoktoSeba donors database.</p>
             </div>
-            <button 
-              onClick={() => openModal('add')} 
-              className={`btn btn-primary ${styles.addBtn}`}
-            >
-              ➕ Add New Donor
-            </button>
+            <div className={styles.headerActions}>
+              <button 
+                onClick={syncAllToGoogleSheets} 
+                className={`btn btn-secondary ${styles.syncBtn}`}
+                disabled={syncing}
+              >
+                {syncing ? '🔄 Syncing...' : '📊 Sync to Google Sheet'}
+              </button>
+              <button 
+                onClick={() => openModal('add')} 
+                className={`btn btn-primary ${styles.addBtn}`}
+              >
+                ➕ Add New Donor
+              </button>
+            </div>
           </header>
 
           {/* Stats Grid */}

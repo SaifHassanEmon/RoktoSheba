@@ -61,6 +61,12 @@
   box-shadow: var(--shadow-accent);
 }
 
+.headerActions {
+  display: flex;
+  gap: 1rem;
+  align-items: center;
+}
+
 /* --- Stats Grid --- */
 .statsGrid {
   display: grid;
