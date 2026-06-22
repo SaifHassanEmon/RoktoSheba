@@ -21,6 +21,7 @@ function SearchContent() {
   });
   const [donors, setDonors] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [seedAttempted, setSeedAttempted] = useState(false);
 
   // Read URL params on mount
   useEffect(() => {
@@ -31,13 +32,24 @@ function SearchContent() {
       const initial = { bloodGroup: bg, area, availableOnly: false, eligibleOnly: false };
       setFilters(initial);
       
-      const results = await getDonors(initial);
+      let results = await getDonors(initial);
+
+      if (results.length <= 2 && !seedAttempted) {
+        try {
+          await fetch('/api/seed', { method: 'POST' });
+          setSeedAttempted(true);
+          results = await getDonors(initial);
+        } catch (error) {
+          console.error('Seed request failed:', error);
+        }
+      }
+
       setDonors(results);
       setLoading(false);
     };
     
     fetchInitialData();
-  }, [searchParams]);
+  }, [searchParams, seedAttempted]);
 
   const handleFilterChange = async (newFilters) => {
     setLoading(true);
