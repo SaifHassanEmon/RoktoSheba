@@ -28,6 +28,9 @@ yarn-error.log*
 # vercel
 .vercel
 
+# ignore nested duplicate repo
+/RoktoSheba/
+
 # typescript
 *.tsbuildinfo
 next-env.d.ts
