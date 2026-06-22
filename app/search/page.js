@@ -77,7 +77,7 @@ function SearchContent() {
         <div className={styles.container}>
           {/* Page header */}
           <div className={styles.pageHeader}>
-            <h1 className={styles.pageTitle}>Find Blood Donors in Dhaka</h1>
+            <h1 className={styles.pageTitle}>Find Blood Donors in Bangladesh</h1>
             <p className={styles.resultsCount}>
               Showing <strong>{donors.length}</strong> donor{donors.length !== 1 ? 's' : ''}
             </p>

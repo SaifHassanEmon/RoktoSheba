@@ -2,18 +2,49 @@
 
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
-import { BLOOD_GROUPS, DHAKA_AREAS } from '@/data/seedDonors';
+import { BLOOD_GROUPS } from '@/data/seedDonors';
+import { BANGLADESH_DATA } from '@/data/bangladeshData';
 import styles from './Hero.module.css';
 
 export default function Hero() {
   const router = useRouter();
   const [bloodGroup, setBloodGroup] = useState('');
+  const [division, setDivision] = useState('');
+  const [district, setDistrict] = useState('');
   const [area, setArea] = useState('');
+  const [districtsList, setDistrictsList] = useState([]);
+  const [areasList, setAreasList] = useState([]);
+
+  const handleDivisionChange = (e) => {
+    const val = e.target.value;
+    setDivision(val);
+    setDistrict('');
+    setArea('');
+    if (val && BANGLADESH_DATA[val]) {
+      setDistrictsList(Object.keys(BANGLADESH_DATA[val].districts));
+    } else {
+      setDistrictsList([]);
+    }
+    setAreasList([]);
+  };
+
+  const handleDistrictChange = (e) => {
+    const val = e.target.value;
+    setDistrict(val);
+    setArea('');
+    if (division && val && BANGLADESH_DATA[division]?.districts[val]) {
+      setAreasList(BANGLADESH_DATA[division].districts[val]);
+    } else {
+      setAreasList([]);
+    }
+  };
 
   const handleSearch = (e) => {
     e.preventDefault();
     const params = new URLSearchParams();
     if (bloodGroup) params.set('bloodGroup', bloodGroup);
+    if (division) params.set('division', division);
+    if (district) params.set('district', district);
     if (area) params.set('area', area);
     router.push(`/search?${params.toString()}`);
   };
@@ -34,7 +65,7 @@ export default function Hero() {
         <div className={styles.heroContent}>
           <div className={styles.badge}>
             <span className={styles.badgeDot} />
-            Saving lives across Dhaka
+            Saving lives across Bangladesh
           </div>
 
           <h1 className={styles.heading}>
@@ -43,12 +74,13 @@ export default function Hero() {
           </h1>
 
           <p className={styles.subtext}>
-            Connecting blood donors with those in need across Dhaka.
+            Connecting blood donors with those in need across Bangladesh.
             No sign-up required — find a donor in seconds.
           </p>
 
           {/* Inline Search Bar */}
           <form className={styles.searchBar} onSubmit={handleSearch}>
+            {/* Blood Group */}
             <div className={styles.selectWrapper}>
               <select
                 value={bloodGroup}
@@ -70,15 +102,62 @@ export default function Hero() {
               </span>
             </div>
 
+            {/* Division */}
+            <div className={styles.selectWrapper}>
+              <select
+                value={division}
+                onChange={handleDivisionChange}
+                className={styles.select}
+                aria-label="Division"
+              >
+                <option value="">Division</option>
+                {Object.keys(BANGLADESH_DATA).map((div) => (
+                  <option key={div} value={div}>
+                    {div}
+                  </option>
+                ))}
+              </select>
+              <span className={styles.selectIcon}>
+                <svg width="12" height="12" viewBox="0 0 12 12" fill="none">
+                  <path d="M3 4.5L6 7.5L9 4.5" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
+                </svg>
+              </span>
+            </div>
+
+            {/* District */}
+            <div className={styles.selectWrapper}>
+              <select
+                value={district}
+                onChange={handleDistrictChange}
+                className={styles.select}
+                disabled={!division}
+                aria-label="District"
+              >
+                <option value="">District</option>
+                {districtsList.map((dist) => (
+                  <option key={dist} value={dist}>
+                    {dist}
+                  </option>
+                ))}
+              </select>
+              <span className={styles.selectIcon}>
+                <svg width="12" height="12" viewBox="0 0 12 12" fill="none">
+                  <path d="M3 4.5L6 7.5L9 4.5" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
+                </svg>
+              </span>
+            </div>
+
+            {/* Area */}
             <div className={styles.selectWrapper}>
               <select
                 value={area}
                 onChange={(e) => setArea(e.target.value)}
                 className={styles.select}
-                aria-label="Area in Dhaka"
+                disabled={!district}
+                aria-label="Area"
               >
-                <option value="">Select Area</option>
-                {DHAKA_AREAS.map((a) => (
+                <option value="">Area</option>
+                {areasList.map((a) => (
                   <option key={a} value={a}>
                     {a}
                   </option>
