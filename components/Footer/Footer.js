@@ -28,7 +28,7 @@ export default function Footer() {
             </p>
             <div className={styles.socials}>
               <a
-                href="https://facebook.com/roktoseba"
+                href="https://www.facebook.com/profile.php?id=61591220214638"
                 target="_blank"
                 rel="noopener noreferrer"
                 className={styles.socialLink}
