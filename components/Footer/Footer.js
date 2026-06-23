@@ -4,6 +4,7 @@ import styles from './Footer.module.css';
 const quickLinks = [
   { label: 'Home', href: '/' },
   { label: 'Find Donors', href: '/search' },
+  { label: 'Blood Banks', href: '/blood-banks' },
   { label: 'Blood Request', href: '/request' },
   { label: 'About', href: '/about' },
   { label: 'Admin Portal', href: '/login?tab=admin' },

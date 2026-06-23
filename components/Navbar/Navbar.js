@@ -74,6 +74,9 @@ export default function Navbar() {
             <Link href="/search" className={styles.navLink}>Find Donors</Link>
           </li>
           <li>
+            <Link href="/blood-banks" className={styles.navLink}>Blood Banks</Link>
+          </li>
+          <li>
             <Link href="/about" className={styles.navLink}>About</Link>
           </li>
         </ul>
@@ -134,6 +137,11 @@ export default function Navbar() {
           <li>
             <Link href="/search" className={styles.mobileLink} onClick={() => setMobileOpen(false)}>
               Find Donors
+            </Link>
+          </li>
+          <li>
+            <Link href="/blood-banks" className={styles.mobileLink} onClick={() => setMobileOpen(false)}>
+              Blood Banks
             </Link>
           </li>
           <li>

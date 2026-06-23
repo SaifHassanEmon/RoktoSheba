@@ -1,0 +1,390 @@
+.main {
+  min-height: 100vh;
+  padding: 3rem 0 5rem;
+  background: var(--bg-secondary);
+}
+
+.container {
+  max-width: var(--container-max);
+  margin: 0 auto;
+  padding: 0 var(--container-padding);
+}
+
+/* --- Header Section --- */
+.pageHeader {
+  text-align: center;
+  margin-bottom: 3rem;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.pageTitle {
+  font-family: 'Outfit', sans-serif;
+  font-size: clamp(2rem, 4vw, 2.75rem);
+  font-weight: 800;
+  letter-spacing: -0.03em;
+  color: var(--text-primary);
+  margin-top: 0.25rem;
+}
+
+.pageSubtitle {
+  color: var(--text-secondary);
+  font-size: 1.1rem;
+  max-width: 600px;
+  line-height: 1.6;
+}
+
+/* --- Geolocation Activation Card --- */
+.geoCard {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 2rem;
+  border-radius: var(--radius-lg);
+  margin-bottom: 1.5rem;
+  gap: 2rem;
+  border: 1px solid var(--accent-glow);
+  box-shadow: 0 8px 32px var(--accent-soft);
+  background: linear-gradient(135deg, rgba(220, 53, 69, 0.05) 0%, rgba(0, 0, 0, 0) 100%);
+}
+
+.geoLeft {
+  display: flex;
+  align-items: center;
+  gap: 1.5rem;
+}
+
+.geoIcon {
+  font-size: 2.5rem;
+  animation: pulse 2s ease infinite;
+}
+
+.geoInfo h3 {
+  font-size: 1.25rem;
+  font-weight: 700;
+  color: var(--text-primary);
+  margin-bottom: 0.25rem;
+}
+
+.geoInfo p {
+  color: var(--text-secondary);
+  font-size: 0.95rem;
+  line-height: 1.5;
+}
+
+.geoRight {
+  flex-shrink: 0;
+}
+
+.locateBtn {
+  font-size: 1rem !important;
+  padding: 0.85rem 1.75rem !important;
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  white-space: nowrap;
+}
+
+/* --- Spinner Animation --- */
+.spinner {
+  width: 18px;
+  height: 18px;
+  border: 2px solid rgba(255, 255, 255, 0.3);
+  border-radius: 50%;
+  border-top-color: #fff;
+  animation: spin 0.8s linear infinite;
+}
+
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
+
+@keyframes pulse {
+  0%, 100% { transform: scale(1); }
+  50% { transform: scale(1.1); }
+}
+
+/* --- Alert Messages --- */
+.alert {
+  padding: 1rem 1.5rem;
+  border-radius: var(--radius);
+  margin-bottom: 2rem;
+  font-size: 0.95rem;
+  font-weight: 500;
+  line-height: 1.5;
+  border: 1px solid transparent;
+}
+
+.alertSuccess {
+  background: rgba(40, 167, 69, 0.1);
+  border-color: rgba(40, 167, 69, 0.25);
+  color: #28a745;
+}
+
+.alertError {
+  background: rgba(220, 53, 69, 0.1);
+  border-color: rgba(220, 53, 69, 0.25);
+  color: #dc3545;
+}
+
+/* --- Filter Bar --- */
+.filterBar {
+  padding: 1.75rem;
+  border-radius: var(--radius-lg);
+  margin-bottom: 3rem;
+}
+
+.filterTitle {
+  font-size: 1.1rem;
+  font-weight: 700;
+  color: var(--text-primary);
+  margin-bottom: 1.25rem;
+}
+
+.filterGrid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 1.5rem;
+}
+
+.inputGroup {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.label {
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: var(--text-secondary);
+}
+
+.select {
+  padding: 0.75rem 1rem;
+  background: var(--bg-secondary);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  color: var(--text-primary);
+  font-size: 0.95rem;
+  cursor: pointer;
+  width: 100%;
+}
+
+.select:focus {
+  border-color: var(--accent);
+  outline: none;
+  box-shadow: 0 0 0 3px var(--accent-glow);
+}
+
+.select:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+/* --- Results Header --- */
+.resultsHeader {
+  margin-bottom: 1.5rem;
+  border-bottom: 1px solid var(--border);
+  padding-bottom: 0.75rem;
+}
+
+.resultsHeader h3 {
+  font-size: 1.25rem;
+  font-weight: 700;
+  color: var(--text-primary);
+}
+
+/* --- Facilities Grid --- */
+.banksGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(340px, 1fr));
+  gap: 2rem;
+}
+
+.bankCard {
+  display: flex;
+  flex-direction: column;
+  padding: 1.75rem;
+  border-radius: var(--radius-lg);
+  transition: var(--transition);
+  position: relative;
+  overflow: hidden;
+}
+
+.bankCard:hover {
+  transform: translateY(-4px);
+  box-shadow: var(--shadow-lg), 0 0 20px var(--accent-soft);
+  border-color: var(--accent-glow);
+}
+
+.cardHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 1rem;
+  margin-bottom: 1rem;
+}
+
+.bankName {
+  font-size: 1.2rem;
+  font-weight: 700;
+  color: var(--text-primary);
+  line-height: 1.4;
+}
+
+.badge {
+  font-size: 0.75rem;
+  font-weight: 700;
+  padding: 0.35rem 0.75rem;
+  border-radius: var(--radius-full);
+  white-space: nowrap;
+}
+
+.activeBadge {
+  background: rgba(40, 167, 69, 0.1);
+  color: #28a745;
+  border: 1px solid rgba(40, 167, 69, 0.2);
+}
+
+.timedBadge {
+  background: rgba(253, 126, 20, 0.1);
+  color: #fd7e14;
+  border: 1px solid rgba(253, 126, 20, 0.2);
+}
+
+/* --- Distance Badge --- */
+.distanceBadge {
+  background: var(--accent-soft);
+  border: 1px solid var(--accent-glow);
+  color: var(--accent);
+  padding: 0.5rem 1rem;
+  border-radius: var(--radius);
+  font-size: 0.85rem;
+  margin-bottom: 1.25rem;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  align-self: flex-start;
+}
+
+.cardBody {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  margin-bottom: 1.75rem;
+  flex-grow: 1;
+}
+
+.infoRow {
+  display: flex;
+  gap: 0.75rem;
+  align-items: flex-start;
+}
+
+.infoIcon {
+  font-size: 1.1rem;
+  flex-shrink: 0;
+}
+
+.infoText {
+  font-size: 0.9rem;
+  color: var(--text-secondary);
+  line-height: 1.5;
+}
+
+.phoneLink {
+  font-size: 0.95rem;
+  font-weight: 600;
+  color: var(--accent);
+  text-decoration: none;
+  transition: var(--transition-fast);
+}
+
+.phoneLink:hover {
+  text-decoration: underline;
+}
+
+.cardActions {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 0.75rem;
+  margin-bottom: 1rem;
+}
+
+.actionBtn {
+  font-size: 0.85rem !important;
+  padding: 0.65rem 0.5rem !important;
+  text-align: center;
+  white-space: nowrap;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.3rem;
+}
+
+.webLink {
+  align-self: center;
+  font-size: 0.8rem;
+  font-weight: 600;
+  color: var(--text-muted);
+  text-decoration: none;
+  transition: var(--transition-fast);
+}
+
+.webLink:hover {
+  color: var(--accent);
+  text-decoration: underline;
+}
+
+/* --- Empty/No Results --- */
+.emptyState {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 5rem 2rem;
+  text-align: center;
+  gap: 1rem;
+}
+
+.emptyIcon {
+  font-size: 4rem;
+  opacity: 0.5;
+}
+
+.emptyState h3 {
+  font-size: 1.25rem;
+  font-weight: 700;
+  color: var(--text-primary);
+}
+
+.emptyState p {
+  color: var(--text-secondary);
+  font-size: 0.95rem;
+  max-width: 400px;
+}
+
+/* --- Responsive Adjustments --- */
+@media (max-width: 768px) {
+  .geoCard {
+    flex-direction: column;
+    text-align: center;
+    padding: 1.5rem;
+  }
+
+  .geoLeft {
+    flex-direction: column;
+    gap: 1rem;
+  }
+
+  .locateBtn {
+    width: 100%;
+  }
+
+  .filterGrid {
+    grid-template-columns: 1fr;
+    gap: 1rem;
+  }
+}
