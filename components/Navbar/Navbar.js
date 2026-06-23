@@ -100,8 +100,8 @@ export default function Navbar() {
           ) : (
             <>
               <Link href="/login" className={styles.navLink}>Login</Link>
-              <Link href="/search" className={`btn btn-primary ${styles.ctaBtn}`}>
-                Donate Now
+              <Link href="/register" className={`btn btn-primary ${styles.ctaBtn}`}>
+                Become a Donor
               </Link>
             </>
           )}
@@ -188,11 +188,11 @@ export default function Navbar() {
                 Login
               </Link>
               <Link
-                href="/search"
+                href="/register"
                 className={`btn btn-primary ${styles.mobileCta}`}
                 onClick={() => setMobileOpen(false)}
               >
-                Donate Now
+                Become a Donor
               </Link>
             </>
           )}
