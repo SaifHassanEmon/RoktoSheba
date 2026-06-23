@@ -6,9 +6,50 @@ import Navbar from '@/components/Navbar/Navbar';
 import SearchFilters from '@/components/SearchFilters/SearchFilters';
 import DonorCard from '@/components/DonorCard/DonorCard';
 import Footer from '@/components/Footer/Footer';
-import { getDonors } from '@/lib/donors';
+import { getDonors, getDivisionForDistrict, isDonorEligible } from '@/lib/donors';
 import { COMPATIBILITY } from '@/data/seedDonors';
 import styles from './page.module.css';
+
+// Client-side in-memory filter helper
+function filterDonorsLocally(donorsList, currentFilters) {
+  return donorsList.filter(donor => {
+    // 1. Blood Group
+    if (currentFilters.bloodGroup && currentFilters.bloodGroup !== 'all') {
+      if (donor.bloodGroup !== currentFilters.bloodGroup) return false;
+    }
+
+    // 2. Division
+    if (currentFilters.division && currentFilters.division !== 'all') {
+      const donorDivision = donor.division || getDivisionForDistrict(donor.district);
+      if (donorDivision !== currentFilters.division) return false;
+    }
+
+    // 3. District
+    if (currentFilters.district && currentFilters.district !== 'all') {
+      const donorDistrict = donor.district || 'Dhaka';
+      if (donorDistrict !== currentFilters.district) return false;
+    }
+
+    // 4. Area
+    if (currentFilters.area && currentFilters.area !== 'all') {
+      const matchPrimary = donor.area === currentFilters.area;
+      const matchAvailable = Array.isArray(donor.areas) && donor.areas.includes(currentFilters.area);
+      if (!matchPrimary && !matchAvailable) return false;
+    }
+
+    // 5. Available Only
+    if (currentFilters.availableOnly) {
+      if (!donor.available) return false;
+    }
+
+    // 6. Eligible Only
+    if (currentFilters.eligibleOnly) {
+      if (!isDonorEligible(donor.lastDonation)) return false;
+    }
+
+    return true;
+  });
+}
 
 function SearchContent() {
   const searchParams = useSearchParams();
@@ -21,53 +62,64 @@ function SearchContent() {
     availableOnly: false,
     eligibleOnly: false,
   });
+  const [allDonors, setAllDonors] = useState([]);
   const [donors, setDonors] = useState([]);
   const [loading, setLoading] = useState(true);
   const [seedAttempted, setSeedAttempted] = useState(false);
 
-  // Read URL params on mount
+  // 1. Fetch all donors from database once on mount (or if seed attempted)
   useEffect(() => {
-    const fetchInitialData = async () => {
+    const loadAllDonors = async () => {
       setLoading(true);
-      const bg = searchParams.get('bloodGroup') || 'all';
-      const div = searchParams.get('division') || 'all';
-      const dist = searchParams.get('district') || 'all';
-      const area = searchParams.get('area') || 'all';
-      const initial = { 
-        bloodGroup: bg, 
-        division: div, 
-        district: dist, 
-        area, 
-        availableOnly: false, 
-        eligibleOnly: false 
-      };
-      setFilters(initial);
-      
-      let results = await getDonors(initial);
+      try {
+        let allResults = await getDonors({});
 
-      if (results.length <= 2 && !seedAttempted) {
-        try {
-          await fetch('/api/seed', { method: 'POST' });
-          setSeedAttempted(true);
-          results = await getDonors(initial);
-        } catch (error) {
-          console.error('Seed request failed:', error);
+        if (allResults.length <= 2 && !seedAttempted) {
+          try {
+            await fetch('/api/seed', { method: 'POST' });
+            setSeedAttempted(true);
+            allResults = await getDonors({});
+          } catch (error) {
+            console.error('Seed request failed:', error);
+          }
         }
-      }
 
-      setDonors(results);
-      setLoading(false);
+        setAllDonors(allResults);
+      } catch (err) {
+        console.error('Failed to load donors:', err);
+      } finally {
+        setLoading(false);
+      }
     };
     
-    fetchInitialData();
-  }, [searchParams, seedAttempted]);
+    loadAllDonors();
+  }, [seedAttempted]);
 
-  const handleFilterChange = async (newFilters) => {
-    setLoading(true);
+  // 2. Synchronize filters and run local filtering whenever searchParams or allDonors changes
+  useEffect(() => {
+    const bg = searchParams.get('bloodGroup') || 'all';
+    const div = searchParams.get('division') || 'all';
+    const dist = searchParams.get('district') || 'all';
+    const area = searchParams.get('area') || 'all';
+    
+    const newFilters = {
+      ...filters,
+      bloodGroup: bg,
+      division: div,
+      district: dist,
+      area
+    };
+    
     setFilters(newFilters);
-    const results = await getDonors(newFilters);
-    setDonors(results);
-    setLoading(false);
+    const filtered = filterDonorsLocally(allDonors, newFilters);
+    setDonors(filtered);
+  }, [searchParams, allDonors]);
+
+  // 3. Handle local filter updates instantly
+  const handleFilterChange = (newFilters) => {
+    setFilters(newFilters);
+    const filtered = filterDonorsLocally(allDonors, newFilters);
+    setDonors(filtered);
   };
 
   return (
