@@ -6,7 +6,6 @@ const quickLinks = [
   { label: 'Find Donors', href: '/search' },
   { label: 'Blood Banks', href: '/blood-banks' },
   { label: 'Blood Request', href: '/request' },
-  { label: 'About', href: '/about' },
   { label: 'Admin Portal', href: '/login?tab=admin' },
 ];
 

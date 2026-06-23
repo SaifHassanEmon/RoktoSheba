@@ -76,9 +76,6 @@ export default function Navbar() {
           <li>
             <Link href="/blood-banks" className={styles.navLink}>Blood Banks</Link>
           </li>
-          <li>
-            <Link href="/about" className={styles.navLink}>About</Link>
-          </li>
         </ul>
 
         {/* Desktop Right Section */}
@@ -142,11 +139,6 @@ export default function Navbar() {
           <li>
             <Link href="/blood-banks" className={styles.mobileLink} onClick={() => setMobileOpen(false)}>
               Blood Banks
-            </Link>
-          </li>
-          <li>
-            <Link href="/about" className={styles.mobileLink} onClick={() => setMobileOpen(false)}>
-              About
             </Link>
           </li>
         </ul>
