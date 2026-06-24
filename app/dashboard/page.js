@@ -55,9 +55,11 @@ export default function DashboardPage() {
     setSaveMessage({ type: '', text: '' });
 
     try {
+      const eligible = isDonorEligible(localLastDonation);
+      const finalAvailability = eligible ? localAvailability : false;
       const docRef = doc(db, 'donors', user.uid);
       await updateDoc(docRef, {
-        available: localAvailability,
+        available: finalAvailability,
         lastDonation: localLastDonation,
       });
       setSaveMessage({ type: 'success', text: 'Profile updated successfully!' });
@@ -135,7 +137,8 @@ export default function DashboardPage() {
                       <label className={styles.switch}>
                         <input
                           type="checkbox"
-                          checked={localAvailability}
+                          checked={eligible ? localAvailability : false}
+                          disabled={!eligible}
                           onChange={(e) => setLocalAvailability(e.target.checked)}
                         />
                         <span className={styles.slider}></span>
@@ -143,7 +146,9 @@ export default function DashboardPage() {
                     </div>
                   </label>
                   <p className={styles.helpText}>
-                    Turn this off if you are temporarily unavailable (e.g., traveling, sick).
+                    {eligible 
+                      ? "Turn this off if you are temporarily unavailable (e.g., traveling, sick)." 
+                      : "Unavailable because you are not eligible to donate yet (must wait 90 days between donations)."}
                   </p>
                 </div>
 

@@ -39,7 +39,7 @@ function filterDonorsLocally(donorsList, currentFilters) {
 
     // 5. Available Only
     if (currentFilters.availableOnly) {
-      if (!donor.available) return false;
+      if (!donor.available || !isDonorEligible(donor.lastDonation)) return false;
     }
 
     // 6. Eligible Only

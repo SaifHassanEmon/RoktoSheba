@@ -16,6 +16,7 @@ import Navbar from '@/components/Navbar/Navbar';
 import Footer from '@/components/Footer/Footer';
 import { BLOOD_GROUPS } from '@/data/seedDonors';
 import { BANGLADESH_DATA } from '@/data/bangladeshData';
+import { isDonorEligible } from '@/lib/donors';
 import styles from './page.module.css';
 
 export default function AdminDashboardPage() {
@@ -336,6 +337,8 @@ export default function AdminDashboardPage() {
     try {
       if (modalMode === 'edit' && currentDonor) {
         const donorRef = doc(db, 'donors', currentDonor.id);
+        const eligible = isDonorEligible(formData.lastDonation);
+        const finalAvailability = eligible ? formData.available : false;
         const updateData = {
           name: formData.name,
           phone: formData.phone,
@@ -347,7 +350,7 @@ export default function AdminDashboardPage() {
           availableAllAreas: modalAvailabilityOption === 'all_district',
           totalDonations: parseInt(formData.totalDonations) || 0,
           lastDonation: formData.lastDonation || null,
-          available: formData.available
+          available: finalAvailability
         };
         if (formData.email) updateData.email = formData.email;
 
@@ -359,6 +362,8 @@ export default function AdminDashboardPage() {
         showToast('Donor profile updated successfully.');
       } else {
         const collectionRef = collection(db, 'donors');
+        const eligible = isDonorEligible(formData.lastDonation);
+        const finalAvailability = eligible ? formData.available : false;
         const newData = {
           name: formData.name,
           email: formData.email || '',
@@ -371,7 +376,7 @@ export default function AdminDashboardPage() {
           availableAllAreas: modalAvailabilityOption === 'all_district',
           totalDonations: parseInt(formData.totalDonations) || 0,
           lastDonation: formData.lastDonation || null,
-          available: formData.available,
+          available: finalAvailability,
           createdAt: new Date()
         };
 
@@ -391,7 +396,7 @@ export default function AdminDashboardPage() {
 
   // Calculate dynamic dashboard stats
   const totalDonors = donors.length;
-  const availableDonors = donors.filter(d => d.available).length;
+  const availableDonors = donors.filter(d => d.available && isDonorEligible(d.lastDonation)).length;
   const unavailableDonors = totalDonors - availableDonors;
   const totalDonations = donors.reduce((sum, d) => sum + (parseInt(d.totalDonations) || 0), 0);
   const totalAreas = new Set(donors.map(d => d.area).filter(Boolean)).size;
@@ -413,10 +418,11 @@ export default function AdminDashboardPage() {
       donor.area === selectedArea || 
       (Array.isArray(donor.areas) && donor.areas.includes(selectedArea));
 
+    const isAvailable = donor.available && isDonorEligible(donor.lastDonation);
     const availabilityMatch = 
       selectedAvailability === 'all' || 
-      (selectedAvailability === 'available' && donor.available) ||
-      (selectedAvailability === 'unavailable' && !donor.available);
+      (selectedAvailability === 'available' && isAvailable) ||
+      (selectedAvailability === 'unavailable' && !isAvailable);
 
     return searchMatch && groupMatch && divisionMatch && districtMatch && areaMatch && availabilityMatch;
   });
@@ -632,7 +638,7 @@ export default function AdminDashboardPage() {
                   </thead>
                   <tbody>
                     {filteredDonors.map(donor => (
-                      <tr key={donor.id} className={!donor.available ? styles.rowUnavailable : ''}>
+                      <tr key={donor.id} className={!(donor.available && isDonorEligible(donor.lastDonation)) ? styles.rowUnavailable : ''}>
                         <td>
                           <div className={styles.donorInfo}>
                             <span className={styles.donorName}>{donor.name}</span>
@@ -659,7 +665,8 @@ export default function AdminDashboardPage() {
                           <label className={styles.switch}>
                             <input 
                               type="checkbox" 
-                              checked={donor.available !== false}
+                              checked={donor.available && isDonorEligible(donor.lastDonation)}
+                              disabled={!isDonorEligible(donor.lastDonation)}
                               onChange={() => handleToggleAvailability(donor.id, donor.available)}
                             />
                             <span className={styles.slider}></span>
@@ -836,11 +843,17 @@ export default function AdminDashboardPage() {
                     <input 
                       type="checkbox" 
                       name="available" 
-                      checked={formData.available} 
+                      checked={isDonorEligible(formData.lastDonation) ? formData.available : false}
+                      disabled={!isDonorEligible(formData.lastDonation)}
                       onChange={handleFormChange}
                     />
                     <span>Available to Donate Now</span>
                   </label>
+                  {!isDonorEligible(formData.lastDonation) && (
+                    <p style={{ fontSize: '0.75rem', color: 'var(--warning)', marginTop: '0.25rem' }}>
+                      Unavailable because donor is not eligible (last donation was less than 90 days ago).
+                    </p>
+                  )}
                 </div>
               </div>
 

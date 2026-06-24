@@ -18,6 +18,7 @@ export default function DonorCard({ donor }) {
   const eligible = isDonorEligible(lastDonation);
   const daysSince = daysSinceLastDonation(lastDonation);
   const daysLeft = daysUntilEligible(lastDonation);
+  const isAvailable = available && eligible;
 
   return (
     <div className={styles.card}>
@@ -51,11 +52,11 @@ export default function DonorCard({ donor }) {
         <div className={styles.stat}>
           <span
             className={`${styles.availDot} ${
-              available ? styles.dotGreen : styles.dotRed
+              isAvailable ? styles.dotGreen : styles.dotRed
             }`}
           />
           <span className={styles.statLabel}>
-            {available ? 'Available' : 'Unavailable'}
+            {isAvailable ? 'Available' : 'Unavailable'}
           </span>
         </div>
       </div>
