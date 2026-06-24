@@ -30,10 +30,17 @@ export const BANGLADESH_DATA = {
   'Dhaka': {
     districts: {
       'Dhaka': [
-        'Badda', 'Banani', 'Bashundhara', 'Dhanmondi', 'Farmgate',
-        'Gulshan', 'Jatrabari', 'Khilgaon', 'Lalbagh', 'Mirpur',
-        'Mohammadpur', 'Motijheel', 'Rampura', 'Shyamoli', 'Tejgaon',
-        'Uttara', 'Wari'
+        'Aftabnagar', 'Agargaon', 'Badda', 'Banasree', 'Banani', 
+        'Banani DOHS', 'Bangshal', 'Basabo', 'Bashundhara', 'Chawkbazar', 
+        'Dakhin Khan', 'Dania', 'Demra', 'Dhanmondi', 'Elephant Road', 
+        'Farmgate', 'Gendaria', 'Goran', 'Gulshan', 'Hatirpool', 
+        'Hazaribagh', 'Jatrabari', 'Kakrail', 'Kalyanpur', 'Kamrangirchar', 
+        'Khilgaon', 'Khilkhet', 'Lalbagh', 'Malibagh', 'Mirpur', 
+        'Mirpur DOHS', 'Moghbazar', 'Mohakhali', 'Mohakhali DOHS', 'Mohammadpur', 
+        'Motijheel', 'Mugdapara', 'New Market', 'Niketan', 'Nikunja', 
+        'Pallabi', 'Paltan', 'Rampura', 'Sadarghat', 'Savar', 
+        'Segunbagicha', 'Shahbagh', 'Shantinagar', 'Shewrapara', 'Shyamoli', 
+        'Sutrapur', 'Tejgaon', 'Uttar Khan', 'Uttara', 'Wari'
       ],
       'Gazipur': ['Gazipur Sadar', 'Tongi', 'Board Bazar', 'Konabari', 'Kaliakair', 'Kaliganj', 'Kapasia', 'Sreepur'],
       'Narayanganj': ['Chashara', 'Signboard', 'Siddhirganj', 'Fatullah', 'Kanchpur', 'Narayanganj Sadar', 'Araihazar', 'Bandar', 'Rupganj', 'Sonargaon'],
