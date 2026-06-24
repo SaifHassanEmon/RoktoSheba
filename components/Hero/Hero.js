@@ -197,19 +197,96 @@ export default function Hero() {
 
         {/* Right decorative illustration */}
         <div className={styles.heroVisual}>
-          <div className={styles.bloodDropLarge}>
-            <div className={styles.dropInner}>
-              <div className={styles.dropHighlight} />
-              <span className={styles.dropPulse} />
-              <span className={styles.dropPulse2} />
+          <div className={styles.visualContainer}>
+            {/* Tilted Orbit Tracks */}
+            <div className={styles.orbitTrack1}>
+              <div className={styles.orbitPath1} />
+              {/* Nodes orbiting on Path 1 */}
+              <div className={`${styles.crystalNode} ${styles.nodeO_Plus}`}>
+                <svg viewBox="0 0 100 100" className={styles.crystalSvg}>
+                  <polygon points="50,5 95,27.5 95,72.5 50,95 5,72.5 5,27.5" fill="rgba(220, 53, 69, 0.05)" stroke="rgba(255, 255, 255, 0.3)" strokeWidth="1.5" />
+                  <line x1="50" y1="5" x2="50" y2="95" stroke="rgba(255, 255, 255, 0.15)" strokeWidth="1" />
+                  <line x1="5" y1="27.5" x2="95" y2="72.5" stroke="rgba(255, 255, 255, 0.15)" strokeWidth="1" />
+                  <line x1="5" y1="72.5" x2="95" y2="27.5" stroke="rgba(255, 255, 255, 0.15)" strokeWidth="1" />
+                  <polygon points="50,20 80,50 50,80 20,50" fill="none" stroke="rgba(255, 255, 255, 0.25)" strokeWidth="1" />
+                </svg>
+                <span className={styles.crystalText}>O+</span>
+              </div>
+              <div className={`${styles.crystalNode} ${styles.nodeB_Plus}`}>
+                <svg viewBox="0 0 100 100" className={styles.crystalSvg}>
+                  <polygon points="50,5 95,27.5 95,72.5 50,95 5,72.5 5,27.5" fill="rgba(220, 53, 69, 0.05)" stroke="rgba(255, 255, 255, 0.3)" strokeWidth="1.5" />
+                  <line x1="50" y1="5" x2="50" y2="95" stroke="rgba(255, 255, 255, 0.15)" strokeWidth="1" />
+                  <line x1="5" y1="27.5" x2="95" y2="72.5" stroke="rgba(255, 255, 255, 0.15)" strokeWidth="1" />
+                  <line x1="5" y1="72.5" x2="95" y2="27.5" stroke="rgba(255, 255, 255, 0.15)" strokeWidth="1" />
+                  <polygon points="50,20 80,50 50,80 20,50" fill="none" stroke="rgba(255, 255, 255, 0.25)" strokeWidth="1" />
+                </svg>
+                <span className={styles.crystalText}>B+</span>
+              </div>
+              <div className={`${styles.crystalNode} ${styles.nodeAB_Minus}`}>
+                <svg viewBox="0 0 100 100" className={styles.crystalSvg}>
+                  <polygon points="50,5 95,27.5 95,72.5 50,95 5,72.5 5,27.5" fill="rgba(220, 53, 69, 0.05)" stroke="rgba(255, 255, 255, 0.3)" strokeWidth="1.5" />
+                  <line x1="50" y1="5" x2="50" y2="95" stroke="rgba(255, 255, 255, 0.15)" strokeWidth="1" />
+                  <line x1="5" y1="27.5" x2="95" y2="72.5" stroke="rgba(255, 255, 255, 0.15)" strokeWidth="1" />
+                  <line x1="5" y1="72.5" x2="95" y2="27.5" stroke="rgba(255, 255, 255, 0.15)" strokeWidth="1" />
+                  <polygon points="50,20 80,50 50,80 20,50" fill="none" stroke="rgba(255, 255, 255, 0.25)" strokeWidth="1" />
+                </svg>
+                <span className={styles.crystalText}>AB-</span>
+              </div>
             </div>
-          </div>
-          {/* Orbiting dots */}
-          <div className={styles.orbit}>
-            <span className={styles.orbitDot} style={{ '--delay': '0s', '--offset': '0deg' }}>A+</span>
-            <span className={styles.orbitDot} style={{ '--delay': '1.5s', '--offset': '90deg' }}>B-</span>
-            <span className={styles.orbitDot} style={{ '--delay': '3s', '--offset': '180deg' }}>O+</span>
-            <span className={styles.orbitDot} style={{ '--delay': '4.5s', '--offset': '270deg' }}>AB</span>
+
+            <div className={styles.orbitTrack2}>
+              <div className={styles.orbitPath2} />
+              {/* Nodes orbiting on Path 2 */}
+              <div className={`${styles.crystalNode} ${styles.nodeA_Plus}`}>
+                <svg viewBox="0 0 100 100" className={styles.crystalSvg}>
+                  <polygon points="50,5 95,27.5 95,72.5 50,95 5,72.5 5,27.5" fill="rgba(220, 53, 69, 0.05)" stroke="rgba(255, 255, 255, 0.3)" strokeWidth="1.5" />
+                  <line x1="50" y1="5" x2="50" y2="95" stroke="rgba(255, 255, 255, 0.15)" strokeWidth="1" />
+                  <line x1="5" y1="27.5" x2="95" y2="72.5" stroke="rgba(255, 255, 255, 0.15)" strokeWidth="1" />
+                  <line x1="5" y1="72.5" x2="95" y2="27.5" stroke="rgba(255, 255, 255, 0.15)" strokeWidth="1" />
+                  <polygon points="50,20 80,50 50,80 20,50" fill="none" stroke="rgba(255, 255, 255, 0.25)" strokeWidth="1" />
+                </svg>
+                <span className={styles.crystalText}>A+</span>
+              </div>
+              <div className={`${styles.crystalNode} ${styles.nodeAB}`}>
+                <svg viewBox="0 0 100 100" className={styles.crystalSvg}>
+                  <polygon points="50,5 95,27.5 95,72.5 50,95 5,72.5 5,27.5" fill="rgba(220, 53, 69, 0.05)" stroke="rgba(255, 255, 255, 0.3)" strokeWidth="1.5" />
+                  <line x1="50" y1="5" x2="50" y2="95" stroke="rgba(255, 255, 255, 0.15)" strokeWidth="1" />
+                  <line x1="5" y1="27.5" x2="95" y2="72.5" stroke="rgba(255, 255, 255, 0.15)" strokeWidth="1" />
+                  <line x1="5" y1="72.5" x2="95" y2="27.5" stroke="rgba(255, 255, 255, 0.15)" strokeWidth="1" />
+                  <polygon points="50,20 80,50 50,80 20,50" fill="none" stroke="rgba(255, 255, 255, 0.25)" strokeWidth="1" />
+                </svg>
+                <span className={styles.crystalText}>AB</span>
+              </div>
+              <div className={`${styles.crystalNode} ${styles.nodeB_Minus}`}>
+                <svg viewBox="0 0 100 100" className={styles.crystalSvg}>
+                  <polygon points="50,5 95,27.5 95,72.5 50,95 5,72.5 5,27.5" fill="rgba(220, 53, 69, 0.05)" stroke="rgba(255, 255, 255, 0.3)" strokeWidth="1.5" />
+                  <line x1="50" y1="5" x2="50" y2="95" stroke="rgba(255, 255, 255, 0.15)" strokeWidth="1" />
+                  <line x1="5" y1="27.5" x2="95" y2="72.5" stroke="rgba(255, 255, 255, 0.15)" strokeWidth="1" />
+                  <line x1="5" y1="72.5" x2="95" y2="27.5" stroke="rgba(255, 255, 255, 0.15)" strokeWidth="1" />
+                  <polygon points="50,20 80,50 50,80 20,50" fill="none" stroke="rgba(255, 255, 255, 0.25)" strokeWidth="1" />
+                </svg>
+                <span className={styles.crystalText}>B-</span>
+              </div>
+            </div>
+
+            {/* Realistic Liquid Blood Drops */}
+            <div className={styles.dropsContainer}>
+              <div className={`${styles.liquidDrop} ${styles.dropBackLeft}`}>
+                <div className={styles.liquidDropInner}>
+                  <div className={styles.liquidHighlight} />
+                </div>
+              </div>
+              <div className={`${styles.liquidDrop} ${styles.dropBackRight}`}>
+                <div className={styles.liquidDropInner}>
+                  <div className={styles.liquidHighlight} />
+                </div>
+              </div>
+              <div className={`${styles.liquidDrop} ${styles.dropFrontLarge}`}>
+                <div className={styles.liquidDropInner}>
+                  <div className={styles.liquidHighlight} />
+                </div>
+              </div>
+            </div>
           </div>
         </div>
       </div>
