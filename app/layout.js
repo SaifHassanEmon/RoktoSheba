@@ -16,15 +16,15 @@ const outfit = Outfit({
 });
 
 export const metadata = {
-  title: 'RoktoSeba — Blood Donation Platform | Dhaka, Bangladesh',
+  title: 'RedpulseBD — Blood Donation Platform | Dhaka, Bangladesh',
   description: 'Connect with blood donors across Dhaka instantly. No sign-up required for recipients. Find matching donors, post emergency blood requests, and save lives.',
   keywords: 'blood donation, Dhaka, Bangladesh, blood donor, blood bank, emergency blood, rokto, রক্তসেবা',
   openGraph: {
-    title: 'RoktoSeba — Every Drop Counts. Save a Life Today.',
+    title: 'RedpulseBD — Every Drop Counts. Save a Life Today.',
     description: 'Connect with blood donors across Dhaka instantly. No sign-up required.',
     type: 'website',
     locale: 'en_BD',
-    siteName: 'RoktoSeba',
+    siteName: 'RedpulseBD',
   },
 };
 

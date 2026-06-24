@@ -41,7 +41,7 @@ export default function LoginPage() {
 
   const handleDemoAdminLogin = () => {
     setFormData({
-      email: 'admin@roktoseba.org',
+      email: 'admin@redpulsebd.org',
       password: 'admin123'
     });
     setActiveTab('admin');
@@ -56,7 +56,7 @@ export default function LoginPage() {
       if (activeTab === 'admin') {
         // Special logic for admin login
         // If email/password are admin credentials, verify or auto-create in Firebase Auth
-        if (formData.email === 'admin@roktoseba.org' && formData.password === 'admin123') {
+        if (formData.email === 'admin@redpulsebd.org' && formData.password === 'admin123') {
           try {
             await signInWithEmailAndPassword(auth, formData.email, formData.password);
           } catch (signInErr) {
@@ -95,7 +95,7 @@ export default function LoginPage() {
         
         if (docSnap.exists() && docSnap.data().role === 'admin') {
           router.push('/admin/dashboard');
-        } else if (formData.email === 'admin@roktoseba.org') {
+        } else if (formData.email === 'admin@redpulsebd.org') {
           // Fallback if role is not set but email is admin
           router.push('/admin/dashboard');
         } else {
@@ -184,7 +184,7 @@ export default function LoginPage() {
                 id="email"
                 name="email"
                 className={styles.input}
-                placeholder={activeTab === 'admin' ? 'admin@roktoseba.org' : 'you@example.com'}
+                placeholder={activeTab === 'admin' ? 'admin@redpulsebd.org' : 'you@example.com'}
                 value={formData.email}
                 onChange={handleChange}
                 required

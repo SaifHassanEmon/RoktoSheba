@@ -1,7 +1,7 @@
 {
-  "name": "roktoseba",
+  "name": "redpulsebd",
   "version": "1.0.0",
-  "description": "RoktoSeba — Blood Donation Platform for Dhaka, Bangladesh",
+  "description": "RedpulseBD — Blood Donation Platform for Dhaka, Bangladesh",
   "private": true,
   "scripts": {
     "dev": "next dev",

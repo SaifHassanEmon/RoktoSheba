@@ -31,15 +31,15 @@ export function AuthProvider({ children }) {
           if (docSnap.exists()) {
             const profileData = docSnap.data();
             setDonorProfile({ id: docSnap.id, ...profileData });
-            setIsAdmin(profileData.role === 'admin' || firebaseUser.email === 'admin@roktoseba.org');
+            setIsAdmin(profileData.role === 'admin' || firebaseUser.email === 'admin@redpulsebd.org');
           } else {
             setDonorProfile(null);
-            setIsAdmin(firebaseUser.email === 'admin@roktoseba.org');
+            setIsAdmin(firebaseUser.email === 'admin@redpulsebd.org');
           }
         } catch (error) {
           console.error("Error fetching donor profile:", error);
           setDonorProfile(null);
-          setIsAdmin(firebaseUser.email === 'admin@roktoseba.org');
+          setIsAdmin(firebaseUser.email === 'admin@redpulsebd.org');
         }
       } else {
         setDonorProfile(null);

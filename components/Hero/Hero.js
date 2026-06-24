@@ -2,6 +2,7 @@
 
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
+import Image from 'next/image';
 import { BLOOD_GROUPS } from '@/data/seedDonors';
 import { BANGLADESH_DATA } from '@/data/bangladeshData';
 import styles from './Hero.module.css';
@@ -199,7 +200,13 @@ export default function Hero() {
         <div className={styles.heroVisual}>
           <div className={styles.bloodDropLarge}>
             <div className={styles.dropInner}>
-              <div className={styles.dropHighlight} />
+              <Image
+                src="/images/logo.png"
+                alt="RedpulseBD Logo"
+                fill
+                priority
+                className={styles.dropImage}
+              />
               <span className={styles.dropPulse} />
               <span className={styles.dropPulse2} />
             </div>

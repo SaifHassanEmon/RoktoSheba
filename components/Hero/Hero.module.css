@@ -193,14 +193,13 @@
 .dropInner {
   width: 200px;
   height: 260px;
-  background: var(--gradient-accent);
-  border-radius: 50% 50% 50% 50% / 30% 30% 70% 70%;
   position: relative;
-  box-shadow:
-    0 20px 60px rgba(220, 53, 69, 0.3),
-    0 10px 30px rgba(220, 53, 69, 0.2),
-    inset 0 -10px 30px rgba(0, 0, 0, 0.1);
   animation: dropFloat 4s ease-in-out infinite;
+}
+
+.dropImage {
+  object-fit: contain;
+  filter: drop-shadow(0 15px 30px rgba(220, 53, 69, 0.45));
 }
 
 .dropHighlight {

@@ -64,13 +64,13 @@ export default function Navbar() {
         <Link href="/" className={styles.logo} onClick={() => setMobileOpen(false)}>
           <Image
             src="/images/logo.png"
-            alt="RoktoSeba Logo"
+            alt="RedpulseBD Logo"
             width={20}
             height={30}
             className={styles.logoIcon}
             priority
           />
-          <span className={styles.logoText}>RoktoSeba</span>
+          <span className={styles.logoText}>RedpulseBD</span>
         </Link>
 
         {/* Desktop Nav Links */}

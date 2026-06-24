@@ -458,7 +458,7 @@ export default function AdminDashboardPage() {
             <div className={styles.headerTitleBox}>
               <span className="badge badge-accent">Admin Portal</span>
               <h1 className={styles.title}>System Dashboard</h1>
-              <p className={styles.subtitle}>Administrative control panel for RoktoSeba donors database.</p>
+              <p className={styles.subtitle}>Administrative control panel for RedpulseBD donors database.</p>
             </div>
             <div className={styles.headerActions}>
               <button 
