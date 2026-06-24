@@ -1,4 +1,5 @@
 import Link from 'next/link';
+import Image from 'next/image';
 import styles from './Footer.module.css';
 
 const quickLinks = [
@@ -19,7 +20,13 @@ export default function Footer() {
           {/* Column 1 — Brand */}
           <div className={styles.brand}>
             <Link href="/" className={styles.logo}>
-              <span className={styles.logoIcon}>🩸</span>
+              <Image
+                src="/images/logo.png"
+                alt="RoktoSeba Logo"
+                width={18}
+                height={27}
+                className={styles.logoIcon}
+              />
               <span className={styles.logoText}>RoktoSeba</span>
             </Link>
             <p className={styles.description}>

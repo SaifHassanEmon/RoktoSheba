@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
+import Image from 'next/image';
 import ThemeToggle from '@/components/ThemeToggle/ThemeToggle';
 import styles from './Navbar.module.css';
 import { useAuth } from '@/context/AuthContext';
@@ -61,7 +62,14 @@ export default function Navbar() {
       <nav className={styles.navInner}>
         {/* Logo */}
         <Link href="/" className={styles.logo} onClick={() => setMobileOpen(false)}>
-          <span className={styles.logoIcon}>🩸</span>
+          <Image
+            src="/images/logo.png"
+            alt="RoktoSeba Logo"
+            width={20}
+            height={30}
+            className={styles.logoIcon}
+            priority
+          />
           <span className={styles.logoText}>RoktoSeba</span>
         </Link>
 
