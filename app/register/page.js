@@ -7,6 +7,7 @@ import { doc, setDoc } from 'firebase/firestore';
 import { auth, db } from '@/lib/firebase';
 import { BLOOD_GROUPS } from '@/data/seedDonors';
 import { BANGLADESH_DATA } from '@/data/bangladeshData';
+import { isDonorEligible } from '@/lib/donors';
 import Navbar from '@/components/Navbar/Navbar';
 import Footer from '@/components/Footer/Footer';
 import Link from 'next/link';
@@ -23,7 +24,10 @@ export default function RegisterPage() {
     bloodGroup: '',
     division: '',
     district: '',
-    area: ''
+    area: '',
+    gender: '',
+    university: '',
+    lastDonation: ''
   });
   
   const [districtsList, setDistrictsList] = useState([]);
@@ -124,6 +128,9 @@ export default function RegisterPage() {
       const userCredential = await createUserWithEmailAndPassword(auth, formData.email, formData.password);
       const user = userCredential.user;
 
+      // Calculate availability based on last donation date (if provided)
+      const eligible = isDonorEligible(formData.lastDonation);
+
       // 2. Save donor profile in Firestore
       await setDoc(doc(db, 'donors', user.uid), {
         name: formData.name,
@@ -135,9 +142,11 @@ export default function RegisterPage() {
         area: formData.area,           // Primary residential area (string)
         areas: finalAreas,             // Areas where donor is available (array)
         availableAllAreas: availabilityOption === 'all_district',
-        available: true,
-        totalDonations: 0,
-        lastDonation: null,
+        available: eligible,           // Mark unavailable if ineligible
+        totalDonations: formData.lastDonation ? 1 : 0,
+        lastDonation: formData.lastDonation || null,
+        gender: formData.gender,
+        university: formData.university || '',
         createdAt: new Date()
       });
 
@@ -155,7 +164,9 @@ export default function RegisterPage() {
             district: formData.district,
             area: formData.area,
             areas: finalAreas.join(', '),
-            lastDonation: 'N/A'
+            lastDonation: formData.lastDonation || 'N/A',
+            gender: formData.gender,
+            university: formData.university || 'N/A'
           }),
         });
       } catch (sheetErr) {
@@ -264,6 +275,54 @@ export default function RegisterPage() {
                   <option key={bg} value={bg}>{bg}</option>
                 ))}
               </select>
+            </div>
+
+            <div className={styles.row}>
+              <div className={styles.inputGroup}>
+                <label htmlFor="gender" className={styles.label}>Gender *</label>
+                <select
+                  id="gender"
+                  name="gender"
+                  className={styles.select}
+                  value={formData.gender}
+                  onChange={handleChange}
+                  required
+                >
+                  <option value="" disabled>Select Gender</option>
+                  <option value="Male">Male</option>
+                  <option value="Female">Female</option>
+                  <option value="Other">Other</option>
+                </select>
+              </div>
+
+              <div className={styles.inputGroup}>
+                <label htmlFor="university" className={styles.label}>University (Optional)</label>
+                <input
+                  type="text"
+                  id="university"
+                  name="university"
+                  className={styles.input}
+                  placeholder="e.g. Dhaka University"
+                  value={formData.university}
+                  onChange={handleChange}
+                />
+              </div>
+            </div>
+
+            <div className={styles.inputGroup}>
+              <label htmlFor="lastDonation" className={styles.label}>Last Donation Date (Optional)</label>
+              <input
+                type="date"
+                id="lastDonation"
+                name="lastDonation"
+                className={styles.input}
+                value={formData.lastDonation}
+                onChange={handleChange}
+                max={new Date().toISOString().split('T')[0]}
+              />
+              <p className={styles.helpText}>
+                Leave empty if you have never donated before. We use this to check your availability/eligibility status.
+              </p>
             </div>
 
             {/* Bangladesh Division & District Selection */}

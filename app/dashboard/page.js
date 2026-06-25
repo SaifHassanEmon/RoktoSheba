@@ -17,6 +17,8 @@ export default function DashboardPage() {
   const [saving, setSaving] = useState(false);
   const [localAvailability, setLocalAvailability] = useState(false);
   const [localLastDonation, setLocalLastDonation] = useState('');
+  const [localGender, setLocalGender] = useState('');
+  const [localUniversity, setLocalUniversity] = useState('');
   const [saveMessage, setSaveMessage] = useState({ type: '', text: '' });
 
   // Redirect if not logged in
@@ -31,6 +33,8 @@ export default function DashboardPage() {
     if (donorProfile) {
       setLocalAvailability(donorProfile.available || false);
       setLocalLastDonation(donorProfile.lastDonation || '');
+      setLocalGender(donorProfile.gender || '');
+      setLocalUniversity(donorProfile.university || '');
     }
   }, [donorProfile]);
 
@@ -61,6 +65,8 @@ export default function DashboardPage() {
       await updateDoc(docRef, {
         available: finalAvailability,
         lastDonation: localLastDonation,
+        gender: localGender,
+        university: localUniversity,
       });
       setSaveMessage({ type: 'success', text: 'Profile updated successfully!' });
       setTimeout(() => setSaveMessage({ type: '', text: '' }), 3000);
@@ -150,6 +156,34 @@ export default function DashboardPage() {
                       ? "Turn this off if you are temporarily unavailable (e.g., traveling, sick)." 
                       : "Unavailable because you are not eligible to donate yet (must wait 90 days between donations)."}
                   </p>
+                </div>
+
+                <div className={styles.formGroup}>
+                  <label htmlFor="gender" className={styles.label}>Gender</label>
+                  <select
+                    id="gender"
+                    className={styles.input}
+                    value={localGender}
+                    onChange={(e) => setLocalGender(e.target.value)}
+                    required
+                  >
+                    <option value="" disabled>Select Gender</option>
+                    <option value="Male">Male</option>
+                    <option value="Female">Female</option>
+                    <option value="Other">Other</option>
+                  </select>
+                </div>
+
+                <div className={styles.formGroup}>
+                  <label htmlFor="university" className={styles.label}>University (Optional)</label>
+                  <input
+                    type="text"
+                    id="university"
+                    className={styles.input}
+                    value={localUniversity}
+                    placeholder="e.g. Dhaka University"
+                    onChange={(e) => setLocalUniversity(e.target.value)}
+                  />
                 </div>
 
                 <div className={styles.formGroup}>

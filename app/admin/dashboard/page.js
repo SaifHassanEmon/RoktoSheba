@@ -50,7 +50,9 @@ export default function AdminDashboardPage() {
     area: '',
     totalDonations: 0,
     lastDonation: '',
-    available: true
+    available: true,
+    gender: '',
+    university: ''
   });
 
   const [modalDistricts, setModalDistricts] = useState([]);
@@ -202,7 +204,9 @@ export default function AdminDashboardPage() {
         area: ar,
         totalDonations: donor.totalDonations || 0,
         lastDonation: donor.lastDonation || '',
-        available: donor.available !== undefined ? donor.available : true
+        available: donor.available !== undefined ? donor.available : true,
+        gender: donor.gender || '',
+        university: donor.university || ''
       });
 
       // Populate dropdown lists
@@ -240,7 +244,9 @@ export default function AdminDashboardPage() {
         area: '',
         totalDonations: 0,
         lastDonation: '',
-        available: true
+        available: true,
+        gender: '',
+        university: ''
       });
       setModalDistricts([]);
       setModalAreas([]);
@@ -350,7 +356,9 @@ export default function AdminDashboardPage() {
           availableAllAreas: modalAvailabilityOption === 'all_district',
           totalDonations: parseInt(formData.totalDonations) || 0,
           lastDonation: formData.lastDonation || null,
-          available: finalAvailability
+          available: finalAvailability,
+          gender: formData.gender || '',
+          university: formData.university || ''
         };
         if (formData.email) updateData.email = formData.email;
 
@@ -377,6 +385,8 @@ export default function AdminDashboardPage() {
           totalDonations: parseInt(formData.totalDonations) || 0,
           lastDonation: formData.lastDonation || null,
           available: finalAvailability,
+          gender: formData.gender || '',
+          university: formData.university || '',
           createdAt: new Date()
         };
 
@@ -823,6 +833,34 @@ export default function AdminDashboardPage() {
                     value={formData.totalDonations} 
                     onChange={handleFormChange}
                     min="0"
+                  />
+                </div>
+
+                <div className={styles.formGroup}>
+                  <label htmlFor="donorGender">Gender</label>
+                  <select 
+                    id="donorGender"
+                    name="gender" 
+                    value={formData.gender} 
+                    onChange={handleFormChange}
+                    required
+                  >
+                    <option value="" disabled>Select Gender</option>
+                    <option value="Male">Male</option>
+                    <option value="Female">Female</option>
+                    <option value="Other">Other</option>
+                  </select>
+                </div>
+
+                <div className={styles.formGroup}>
+                  <label htmlFor="donorUniversity">University (Optional)</label>
+                  <input 
+                    type="text" 
+                    id="donorUniversity"
+                    name="university" 
+                    value={formData.university} 
+                    onChange={handleFormChange}
+                    placeholder="e.g. Dhaka University"
                   />
                 </div>
 
