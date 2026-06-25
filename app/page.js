@@ -5,6 +5,7 @@ import StatsCounter from '@/components/StatsCounter/StatsCounter';
 import HowItWorks from '@/components/HowItWorks/HowItWorks';
 import Testimonials from '@/components/Testimonials/Testimonials';
 import Footer from '@/components/Footer/Footer';
+import Chatbot from '@/components/Chatbot/Chatbot';
 
 export default function Home() {
   return (
@@ -18,6 +19,7 @@ export default function Home() {
         <Testimonials />
       </main>
       <Footer />
+      <Chatbot />
     </>
   );
 }
