@@ -234,3 +234,188 @@ input:checked + .slider:before {
     max-width: 100%;
   }
 }
+
+/* --- Dashboard Grid & Requests Panel --- */
+.dashboardGrid {
+  display: grid;
+  grid-template-columns: 1.1fr 1.4fr;
+  gap: 2rem;
+  align-items: start;
+  margin-top: 1rem;
+}
+
+.requestsCard {
+  padding: 2rem;
+}
+
+.requestsCard h2 {
+  margin-bottom: 1.5rem;
+  font-size: 1.5rem;
+  padding-bottom: 1rem;
+  border-bottom: 1px solid var(--border-light);
+}
+
+.requestsLoader {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 3rem 0;
+  gap: 1rem;
+  color: var(--text-secondary);
+}
+
+.miniSpinner {
+  width: 24px;
+  height: 24px;
+  border: 2px solid var(--border);
+  border-top-color: var(--accent);
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+}
+
+.noRequests {
+  text-align: center;
+  padding: 3rem 1rem;
+  background: rgba(255, 255, 255, 0.02);
+  border: 1px dashed var(--border);
+  border-radius: var(--radius);
+  color: var(--text-secondary);
+  font-size: 0.95rem;
+}
+
+.requestsList {
+  display: flex;
+  flex-direction: column;
+  gap: 1.25rem;
+  max-height: 500px;
+  overflow-y: auto;
+  padding-right: 0.5rem;
+}
+
+.requestItem {
+  background: var(--bg-secondary);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 1.25rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+  transition: var(--transition-fast);
+}
+
+.requestItem:hover {
+  border-color: var(--border-light);
+  transform: translateY(-1px);
+}
+
+.reqHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.statusBadge {
+  font-size: 0.75rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  padding: 0.2rem 0.5rem;
+  border-radius: 4px;
+}
+
+.statusApproved { background: #dcfce7; color: #16a34a; }
+.statusPending { background: #fef3c7; color: #d97706; }
+.statusRejected { background: #fee2e2; color: #dc2626; }
+
+.reqBody {
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+  font-size: 0.9rem;
+  color: var(--text-secondary);
+}
+
+.reqBody strong {
+  color: var(--text-primary);
+}
+
+.targetDonorText {
+  margin-top: 0.25rem;
+  border-top: 1px dashed var(--border);
+  padding-top: 0.5rem;
+  font-size: 0.85rem;
+}
+
+.statusNotice {
+  font-size: 0.8rem;
+  font-style: italic;
+  color: var(--text-muted);
+  margin-top: 0.5rem;
+  background: rgba(245, 158, 11, 0.05);
+  padding: 0.5rem;
+  border-radius: 4px;
+}
+
+.statusNoticeRejected {
+  font-size: 0.8rem;
+  font-style: italic;
+  color: var(--danger);
+  margin-top: 0.5rem;
+  background: rgba(220, 53, 69, 0.05);
+  padding: 0.5rem;
+  border-radius: 4px;
+}
+
+.revealedContact {
+  margin-top: 0.75rem;
+  background: var(--bg-primary);
+  border: 1px solid var(--success);
+  border-radius: var(--radius);
+  padding: 1rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.contactLabel {
+  font-size: 0.8rem;
+  font-weight: 700;
+  color: var(--success) !important;
+}
+
+.phoneDisplay {
+  font-family: 'Outfit', sans-serif;
+  font-size: 1.3rem;
+  font-weight: 700;
+  color: var(--text-primary) !important;
+  letter-spacing: 0.03em;
+}
+
+.revealedActions {
+  display: flex;
+  gap: 0.5rem;
+  margin-top: 0.25rem;
+}
+
+.revealedBtn {
+  flex: 1;
+  font-size: 0.8rem !important;
+  height: 34px !important;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+@media (max-width: 992px) {
+  .dashboardGrid {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 640px) {
+  .requestsCard {
+    padding: 1.5rem;
+  }
+}
+

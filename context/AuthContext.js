@@ -9,6 +9,7 @@ const AuthContext = createContext({
   user: null,
   donorProfile: null,
   isAdmin: false,
+  isModerator: false,
   loading: true,
 });
 
@@ -16,6 +17,7 @@ export function AuthProvider({ children }) {
   const [user, setUser] = useState(null);
   const [donorProfile, setDonorProfile] = useState(null);
   const [isAdmin, setIsAdmin] = useState(false);
+  const [isModerator, setIsModerator] = useState(false);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
@@ -31,19 +33,26 @@ export function AuthProvider({ children }) {
           if (docSnap.exists()) {
             const profileData = docSnap.data();
             setDonorProfile({ id: docSnap.id, ...profileData });
-            setIsAdmin(profileData.role === 'admin' || firebaseUser.email === 'admin@redpulsebd.org');
+            const adminVal = profileData.role === 'admin' || firebaseUser.email === 'admin@redpulsebd.org';
+            setIsAdmin(adminVal);
+            setIsModerator(adminVal || profileData.role === 'moderator');
           } else {
             setDonorProfile(null);
-            setIsAdmin(firebaseUser.email === 'admin@redpulsebd.org');
+            const adminVal = firebaseUser.email === 'admin@redpulsebd.org';
+            setIsAdmin(adminVal);
+            setIsModerator(adminVal);
           }
         } catch (error) {
           console.error("Error fetching donor profile:", error);
           setDonorProfile(null);
-          setIsAdmin(firebaseUser.email === 'admin@redpulsebd.org');
+          const adminVal = firebaseUser.email === 'admin@redpulsebd.org';
+          setIsAdmin(adminVal);
+          setIsModerator(adminVal);
         }
       } else {
         setDonorProfile(null);
         setIsAdmin(false);
+        setIsModerator(false);
       }
       
       setLoading(false);
@@ -53,7 +62,7 @@ export function AuthProvider({ children }) {
   }, []);
 
   return (
-    <AuthContext.Provider value={{ user, donorProfile, isAdmin, loading }}>
+    <AuthContext.Provider value={{ user, donorProfile, isAdmin, isModerator, loading }}>
       {children}
     </AuthContext.Provider>
   );

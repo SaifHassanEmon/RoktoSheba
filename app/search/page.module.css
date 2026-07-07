@@ -17,8 +17,10 @@
 /* --- Page Header --- */
 .pageHeader {
   display: flex;
-  flex-direction: column;
-  gap: 0.35rem;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 1rem;
 }
 
 .pageTitle {

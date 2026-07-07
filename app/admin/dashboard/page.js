@@ -52,7 +52,8 @@ export default function AdminDashboardPage() {
     lastDonation: '',
     available: true,
     gender: '',
-    university: ''
+    university: '',
+    role: 'donor'
   });
 
   const [modalDistricts, setModalDistricts] = useState([]);
@@ -206,7 +207,8 @@ export default function AdminDashboardPage() {
         lastDonation: donor.lastDonation || '',
         available: donor.available !== undefined ? donor.available : true,
         gender: donor.gender || '',
-        university: donor.university || ''
+        university: donor.university || '',
+        role: donor.role || 'donor'
       });
 
       // Populate dropdown lists
@@ -246,7 +248,8 @@ export default function AdminDashboardPage() {
         lastDonation: '',
         available: true,
         gender: '',
-        university: ''
+        university: '',
+        role: 'donor'
       });
       setModalDistricts([]);
       setModalAreas([]);
@@ -358,7 +361,8 @@ export default function AdminDashboardPage() {
           lastDonation: formData.lastDonation || null,
           available: finalAvailability,
           gender: formData.gender || '',
-          university: formData.university || ''
+          university: formData.university || '',
+          role: formData.role || 'donor'
         };
         if (formData.email) updateData.email = formData.email;
 
@@ -387,6 +391,7 @@ export default function AdminDashboardPage() {
           available: finalAvailability,
           gender: formData.gender || '',
           university: formData.university || '',
+          role: formData.role || 'donor',
           createdAt: new Date()
         };
 
@@ -651,7 +656,23 @@ export default function AdminDashboardPage() {
                       <tr key={donor.id} className={!(donor.available && isDonorEligible(donor.lastDonation)) ? styles.rowUnavailable : ''}>
                         <td>
                           <div className={styles.donorInfo}>
-                            <span className={styles.donorName}>{donor.name}</span>
+                            <div style={{ display: 'flex', alignItems: 'center', gap: '0.4rem', flexWrap: 'wrap' }}>
+                              <span className={styles.donorName}>{donor.name}</span>
+                              {donor.role && donor.role !== 'donor' && (
+                                <span style={{ 
+                                  fontSize: '0.65rem', 
+                                  padding: '0.1rem 0.35rem', 
+                                  borderRadius: '4px',
+                                  background: donor.role === 'admin' ? 'var(--danger-bg)' : 'var(--info-bg)',
+                                  color: donor.role === 'admin' ? 'var(--danger)' : 'var(--info)',
+                                  border: `1px solid ${donor.role === 'admin' ? 'rgba(239, 68, 68, 0.2)' : 'rgba(59, 130, 246, 0.2)'}`,
+                                  fontWeight: '700',
+                                  textTransform: 'uppercase'
+                                }}>
+                                  {donor.role}
+                                </span>
+                              )}
+                            </div>
                             {donor.email && <span className={styles.donorEmail}>{donor.email}</span>}
                           </div>
                         </td>
@@ -851,6 +872,21 @@ export default function AdminDashboardPage() {
                     <option value="Other">Other</option>
                   </select>
                 </div>
+
+                <div className={styles.formGroup}>
+                   <label htmlFor="donorRole">System Role *</label>
+                   <select 
+                     id="donorRole"
+                     name="role" 
+                     value={formData.role || 'donor'} 
+                     onChange={handleFormChange}
+                     required
+                   >
+                     <option value="donor">Donor (Default)</option>
+                     <option value="moderator">Moderator</option>
+                     <option value="admin">Admin</option>
+                   </select>
+                 </div>
 
                 <div className={styles.formGroup}>
                   <label htmlFor="donorUniversity">University (Optional)</label>

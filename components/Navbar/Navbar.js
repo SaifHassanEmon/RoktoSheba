@@ -13,7 +13,7 @@ import { useRouter } from 'next/navigation';
 export default function Navbar() {
   const [scrolled, setScrolled] = useState(false);
   const [mobileOpen, setMobileOpen] = useState(false);
-  const { user, isAdmin } = useAuth();
+  const { user, isAdmin, isModerator } = useAuth();
   const router = useRouter();
 
   useEffect(() => {
@@ -82,6 +82,9 @@ export default function Navbar() {
             <Link href="/search" className={styles.navLink}>Find Donors</Link>
           </li>
           <li>
+            <Link href="/search?request=true" className={styles.navLink}>Request Blood</Link>
+          </li>
+          <li>
             <Link href="/blood-banks" className={styles.navLink}>Blood Banks</Link>
           </li>
         </ul>
@@ -91,6 +94,11 @@ export default function Navbar() {
           <ThemeToggle />
           {user ? (
             <>
+              {isModerator && (
+                <Link href="/moderator" className={styles.navLink}>
+                  Moderator Desk
+                </Link>
+              )}
               {isAdmin ? (
                 <Link href="/admin/dashboard" className={`${styles.navLink} ${styles.adminLink}`}>
                   Admin Dashboard <span className={styles.adminBadge}>Admin</span>
@@ -145,6 +153,11 @@ export default function Navbar() {
             </Link>
           </li>
           <li>
+            <Link href="/search?request=true" className={styles.mobileLink} onClick={() => setMobileOpen(false)}>
+              Request Blood
+            </Link>
+          </li>
+          <li>
             <Link href="/blood-banks" className={styles.mobileLink} onClick={() => setMobileOpen(false)}>
               Blood Banks
             </Link>
@@ -154,6 +167,15 @@ export default function Navbar() {
           <ThemeToggle />
           {user ? (
             <>
+              {isModerator && (
+                <Link
+                  href="/moderator"
+                  className={`btn btn-secondary ${styles.mobileCta}`}
+                  onClick={() => setMobileOpen(false)}
+                >
+                  Moderator Desk
+                </Link>
+              )}
               {isAdmin ? (
                 <Link
                   href="/admin/dashboard"

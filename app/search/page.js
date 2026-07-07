@@ -5,6 +5,7 @@ import { useSearchParams } from 'next/navigation';
 import Navbar from '@/components/Navbar/Navbar';
 import SearchFilters from '@/components/SearchFilters/SearchFilters';
 import DonorCard from '@/components/DonorCard/DonorCard';
+import RequestBloodModal from '@/components/RequestBloodModal/RequestBloodModal';
 import Footer from '@/components/Footer/Footer';
 import { getDonors, getDivisionForDistrict, isDonorEligible } from '@/lib/donors';
 import { COMPATIBILITY } from '@/data/seedDonors';
@@ -54,6 +55,8 @@ function filterDonorsLocally(donorsList, currentFilters) {
 function SearchContent() {
   const searchParams = useSearchParams();
   const [compatOpen, setCompatOpen] = useState(false);
+  const [selectedDonorForRequest, setSelectedDonorForRequest] = useState(null);
+  const [isRequestModalOpen, setIsRequestModalOpen] = useState(false);
   const [filters, setFilters] = useState({
     bloodGroup: 'all',
     division: 'all',
@@ -101,6 +104,12 @@ function SearchContent() {
     const div = searchParams.get('division') || 'all';
     const dist = searchParams.get('district') || 'all';
     const area = searchParams.get('area') || 'all';
+    const req = searchParams.get('request') === 'true';
+
+    if (req) {
+      setSelectedDonorForRequest(null);
+      setIsRequestModalOpen(true);
+    }
     
     const newFilters = {
       ...filters,
@@ -129,10 +138,19 @@ function SearchContent() {
         <div className={styles.container}>
           {/* Page header */}
           <div className={styles.pageHeader}>
-            <h1 className={styles.pageTitle}>Find Blood Donors in Bangladesh</h1>
-            <p className={styles.resultsCount}>
-              Showing <strong>{donors.length}</strong> donor{donors.length !== 1 ? 's' : ''}
-            </p>
+            <div>
+              <h1 className={styles.pageTitle}>Find Blood Donors in Bangladesh</h1>
+              <p className={styles.resultsCount}>
+                Showing <strong>{donors.length}</strong> donor{donors.length !== 1 ? 's' : ''}
+              </p>
+            </div>
+            <button
+              onClick={() => handleRequestBlood(null)}
+              className="btn btn-primary"
+              style={{ display: 'inline-flex', alignItems: 'center', gap: '0.5rem', height: '42px' }}
+            >
+              🩸 Post General Blood Request
+            </button>
           </div>
 
           {/* Filters */}
@@ -147,7 +165,14 @@ function SearchContent() {
           ) : donors.length > 0 ? (
             <div className={styles.grid}>
               {donors.map((donor) => (
-                <DonorCard key={donor.id} donor={donor} />
+                <DonorCard
+                  key={donor.id}
+                  donor={donor}
+                  onRequestBlood={(d) => {
+                    setSelectedDonorForRequest(d);
+                    setIsRequestModalOpen(true);
+                  }}
+                />
               ))}
             </div>
           ) : (
@@ -223,6 +248,16 @@ function SearchContent() {
       </main>
 
       <Footer />
+
+      {isRequestModalOpen && (
+        <RequestBloodModal
+          donor={selectedDonorForRequest}
+          onClose={() => {
+            setIsRequestModalOpen(false);
+            setSelectedDonorForRequest(null);
+          }}
+        />
+      )}
     </>
   );
 }

@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import { useAuth } from '@/context/AuthContext';
-import { doc, updateDoc } from 'firebase/firestore';
+import { doc, updateDoc, collection, query, where, getDocs } from 'firebase/firestore';
 import { db } from '@/lib/firebase';
 import { useRouter } from 'next/navigation';
 import { isDonorEligible, daysUntilEligible } from '@/lib/donors';
@@ -20,6 +20,8 @@ export default function DashboardPage() {
   const [localGender, setLocalGender] = useState('');
   const [localUniversity, setLocalUniversity] = useState('');
   const [saveMessage, setSaveMessage] = useState({ type: '', text: '' });
+  const [requests, setRequests] = useState([]);
+  const [requestsLoading, setRequestsLoading] = useState(true);
 
   // Redirect if not logged in
   useEffect(() => {
@@ -37,6 +39,27 @@ export default function DashboardPage() {
       setLocalUniversity(donorProfile.university || '');
     }
   }, [donorProfile]);
+
+  useEffect(() => {
+    const fetchMyRequests = async () => {
+      if (!user) return;
+      try {
+        const q = query(
+          collection(db, 'blood_requests'),
+          where('requestedBy', '==', user.uid)
+        );
+        const querySnapshot = await getDocs(q);
+        const reqList = querySnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+        reqList.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
+        setRequests(reqList);
+      } catch (error) {
+        console.error('Error fetching requests:', error);
+      } finally {
+        setRequestsLoading(false);
+      }
+    };
+    fetchMyRequests();
+  }, [user]);
 
   if (loading || !user) {
     return (
@@ -131,7 +154,8 @@ export default function DashboardPage() {
             </div>
           </div>
 
-          <div className={styles.settingsWrapper}>
+          <div className={styles.dashboardGrid}>
+            {/* Donation Settings */}
             <div className={`card-glass ${styles.settingsCard}`}>
               <h2>Donation Settings</h2>
               
@@ -215,6 +239,82 @@ export default function DashboardPage() {
                   {saving ? 'Saving...' : 'Save Changes'}
                 </button>
               </form>
+            </div>
+
+            {/* My Blood Requests panel */}
+            <div className={`card-glass ${styles.requestsCard}`}>
+              <h2>My Blood Requests</h2>
+              
+              {requestsLoading ? (
+                <div className={styles.requestsLoader}>
+                  <div className={styles.miniSpinner}></div>
+                  <p>Loading requests...</p>
+                </div>
+              ) : requests.length === 0 ? (
+                <div className={styles.noRequests}>
+                  <p>You haven't submitted any blood requests yet.</p>
+                  <p style={{ fontSize: '0.85rem', color: 'var(--text-muted)', marginTop: '0.5rem' }}>
+                    Find donors on the <a href="/search" style={{ color: 'var(--accent)', textDecoration: 'underline' }}>Search page</a> to request blood.
+                  </p>
+                </div>
+              ) : (
+                <div className={styles.requestsList}>
+                  {requests.map(req => {
+                    const reqDateFormatted = req.requiredDate ? new Date(req.requiredDate).toLocaleDateString('en-US', {
+                      month: 'short', day: 'numeric', year: 'numeric'
+                    }) : 'N/A';
+                    
+                    return (
+                      <div key={req.id} className={styles.requestItem}>
+                        <div className={styles.reqHeader}>
+                          <span className={`badge badge-accent`}>{req.bloodGroup}</span>
+                          <span className={`${styles.statusBadge} ${
+                            req.status === 'approved' ? styles.statusApproved :
+                            req.status === 'rejected' ? styles.statusRejected : styles.statusPending
+                          }`}>
+                            {req.status === 'approved' ? 'Approved' : req.status === 'rejected' ? 'Rejected' : 'Pending'}
+                          </span>
+                        </div>
+                        
+                        <div className={styles.reqBody}>
+                          <p>Patient: <strong>{req.patientName}</strong></p>
+                          <p>Hospital: <strong>{req.hospital}</strong></p>
+                          <p>Needed On: <strong>{reqDateFormatted}</strong> ({req.unitsRequired} unit{req.unitsRequired > 1 ? 's' : ''})</p>
+                          <p className={styles.targetDonorText}>Target Donor: <strong>{req.donorName}</strong></p>
+                          
+                          {req.status === 'approved' && req.donorPhone && (
+                            <div className={styles.revealedContact}>
+                              <p className={styles.contactLabel}>✅ Donor Contact Shared:</p>
+                              <p className={styles.phoneDisplay}>📞 {req.donorPhone}</p>
+                              <div className={styles.revealedActions}>
+                                <a href={`tel:${req.donorPhone}`} className={`btn btn-primary ${styles.revealedBtn}`}>
+                                  Call Donor
+                                </a>
+                                <a 
+                                  href={`https://wa.me/${req.donorPhone.replace(/[^0-9]/g, '')}`} 
+                                  target="_blank" 
+                                  rel="noopener noreferrer" 
+                                  className={`btn btn-secondary ${styles.revealedBtn}`}
+                                >
+                                  WhatsApp
+                                </a>
+                              </div>
+                            </div>
+                          )}
+
+                          {req.status === 'pending' && (
+                            <p className={styles.statusNotice}>⌛ Pending moderator verification. Contact details will appear here once verified.</p>
+                          )}
+                          
+                          {req.status === 'rejected' && (
+                            <p className={styles.statusNoticeRejected}>❌ This request was rejected by our moderators.</p>
+                          )}
+                        </div>
+                      </div>
+                    );
+                  })}
+                </div>
+              )}
             </div>
           </div>
         </div>
