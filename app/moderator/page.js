@@ -300,7 +300,7 @@ export default function ModeratorPage() {
                         <div>
                           <h3 className={styles.patientName}>Patient: {req.patientName}</h3>
                           <p className={styles.attendantInfo}>
-                            Attendant: <strong>{req.attendantName}</strong> | Requester Email: {req.requesterEmail || 'N/A'}
+                            Attendant: <strong>{req.attendantName}</strong> | Contact Phone: <strong>{req.contactPhone}</strong> | Requester Email: {req.requesterEmail || 'N/A'}
                           </p>
                           <p className={styles.dateHospital}>
                             📅 Need Date: <strong>{reqDateFormatted}</strong> | 🏥 Hospital: <strong>{req.hospital}</strong>
