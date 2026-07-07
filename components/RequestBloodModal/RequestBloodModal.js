@@ -5,6 +5,7 @@ import { useAuth } from '@/context/AuthContext';
 import { collection, addDoc } from 'firebase/firestore';
 import { db } from '@/lib/firebase';
 import Link from 'next/link';
+import { DHAKA_AREAS } from '@/data/seedDonors';
 import styles from './RequestBloodModal.module.css';
 
 export default function RequestBloodModal({ donor, onClose }) {
@@ -17,6 +18,7 @@ export default function RequestBloodModal({ donor, onClose }) {
   const [unitsRequired, setUnitsRequired] = useState('');
   const [requiredDate, setRequiredDate] = useState('');
   const [hospital, setHospital] = useState('');
+  const [area, setArea] = useState('');
   const [contactPhone, setContactPhone] = useState('');
   const [wardRoom, setWardRoom] = useState('');
   const [additionalNotes, setAdditionalNotes] = useState('');
@@ -30,12 +32,15 @@ export default function RequestBloodModal({ donor, onClose }) {
   useEffect(() => {
     if (donor) {
       setBloodGroup(donor.bloodGroup);
+      setArea(donor.area || '');
+    } else {
+      setArea('');
     }
   }, [donor]);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    if (!patientName || !attendantName || !bloodGroup || !unitsRequired || !requiredDate || !hospital || !contactPhone) {
+    if (!patientName || !attendantName || !bloodGroup || !unitsRequired || !requiredDate || !hospital || !area || !contactPhone) {
       setError('Please fill in all required fields marked with *');
       return;
     }
@@ -51,6 +56,7 @@ export default function RequestBloodModal({ donor, onClose }) {
         unitsRequired: parseInt(unitsRequired) || 1,
         requiredDate,
         hospital,
+        area,
         contactPhone,
         wardRoom,
         additionalNotes,
@@ -209,16 +215,33 @@ export default function RequestBloodModal({ donor, onClose }) {
                   </div>
                 </div>
 
-                <div className={styles.inputGroup}>
-                  <label htmlFor="hospital">HOSPITAL / CLINIC *</label>
-                  <input
-                    type="text"
-                    id="hospital"
-                    value={hospital}
-                    onChange={(e) => setHospital(e.target.value)}
-                    placeholder="Hospital name and address"
-                    required
-                  />
+                <div className={styles.grid}>
+                  <div className={styles.inputGroup}>
+                    <label htmlFor="hospital">HOSPITAL / CLINIC *</label>
+                    <input
+                      type="text"
+                      id="hospital"
+                      value={hospital}
+                      onChange={(e) => setHospital(e.target.value)}
+                      placeholder="Hospital name and address"
+                      required
+                    />
+                  </div>
+
+                  <div className={styles.inputGroup}>
+                    <label htmlFor="area">AREA / LOCATION *</label>
+                    <select
+                      id="area"
+                      value={area}
+                      onChange={(e) => setArea(e.target.value)}
+                      required
+                    >
+                      <option value="" disabled>Select Area</option>
+                      {DHAKA_AREAS.map((a) => (
+                        <option key={a} value={a}>{a}</option>
+                      ))}
+                    </select>
+                  </div>
                 </div>
 
                 <div className={styles.grid}>
