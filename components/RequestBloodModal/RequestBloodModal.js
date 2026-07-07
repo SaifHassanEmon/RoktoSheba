@@ -35,11 +35,6 @@ export default function RequestBloodModal({ donor, onClose }) {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    if (!user) {
-      setError('You must be logged in to submit a request.');
-      return;
-    }
-
     if (!patientName || !attendantName || !bloodGroup || !unitsRequired || !requiredDate || !hospital || !contactPhone) {
       setError('Please fill in all required fields marked with *');
       return;
@@ -63,8 +58,8 @@ export default function RequestBloodModal({ donor, onClose }) {
         donorId: donor?.id || 'general',
         donorName: donor?.name || 'Any Compatible Donor',
         status: 'pending',
-        requestedBy: user.uid,
-        requesterEmail: user.email,
+        requestedBy: user ? user.uid : 'guest',
+        requesterEmail: user ? user.email : 'guest',
         createdAt: new Date().toISOString()
       });
 
@@ -112,19 +107,6 @@ export default function RequestBloodModal({ donor, onClose }) {
 
             {error && <div className={styles.errorMsg}>{error}</div>}
 
-            {!user && !loading ? (
-              <div className={styles.loginRequired}>
-                <p>You need to be logged in to request blood details.</p>
-                <div className={styles.loginActions}>
-                  <Link href="/login" className="btn btn-primary" onClick={onClose}>
-                    Login
-                  </Link>
-                  <Link href="/register" className="btn btn-secondary" onClick={onClose}>
-                    Register
-                  </Link>
-                </div>
-              </div>
-            ) : (
               <form onSubmit={handleSubmit} className={styles.form}>
                 {/* Urgency Toggle */}
                 <div className={styles.urgencySection}>
@@ -284,7 +266,6 @@ export default function RequestBloodModal({ donor, onClose }) {
                   </button>
                 </div>
               </form>
-            )}
           </>
         )}
       </div>
