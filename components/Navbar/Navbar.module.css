@@ -70,35 +70,49 @@
 
 .navLink {
   padding: 0.5rem 1rem;
-  font-size: 0.95rem;
-  font-weight: 500;
+  font-size: 0.9rem;
+  font-weight: 600;
   color: var(--text-secondary);
   text-decoration: none;
   border-radius: var(--radius);
+  border: 1px solid var(--border);
+  background: rgba(255, 255, 255, 0.02);
   transition: var(--transition-fast);
   position: relative;
-}
-
-.navLink::after {
-  content: '';
-  position: absolute;
-  bottom: 2px;
-  left: 50%;
-  width: 0;
-  height: 2px;
-  background: var(--accent);
-  border-radius: 1px;
-  transition: var(--transition);
-  transform: translateX(-50%);
+  white-space: nowrap;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  height: 38px;
 }
 
 .navLink:hover {
   color: var(--accent);
   background: var(--accent-soft);
+  border-color: var(--accent);
 }
 
-.navLink:hover::after {
-  width: 60%;
+.logoutBtn {
+  padding: 0.5rem 1rem;
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: var(--text-secondary);
+  text-decoration: none;
+  border-radius: var(--radius);
+  border: 1px solid var(--border);
+  background: rgba(255, 255, 255, 0.02);
+  transition: var(--transition-fast);
+  white-space: nowrap;
+  display: inline-flex;
+  align-items: center;
+  height: 38px;
+  cursor: pointer;
+}
+
+.logoutBtn:hover {
+  color: var(--danger);
+  background: var(--danger-bg);
+  border-color: var(--danger);
 }
 
 /* --- Right Section --- */

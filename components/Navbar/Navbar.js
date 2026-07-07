@@ -106,7 +106,7 @@ export default function Navbar() {
               ) : (
                 <Link href="/dashboard" className={styles.navLink}>Dashboard</Link>
               )}
-              <button onClick={handleLogout} className="btn btn-ghost">
+              <button onClick={handleLogout} className={styles.logoutBtn}>
                 Logout
               </button>
             </>
