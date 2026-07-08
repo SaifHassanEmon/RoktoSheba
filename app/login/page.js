@@ -12,7 +12,7 @@ import styles from './page.module.css';
 
 export default function LoginPage() {
   const router = useRouter();
-  const [activeTab, setActiveTab] = useState('donor'); // 'donor' or 'admin'
+  const [activeTab, setActiveTab] = useState('donor'); // 'donor', 'recipient', or 'admin'
   
   const [formData, setFormData] = useState({
     email: '',
@@ -28,6 +28,8 @@ export default function LoginPage() {
       const tab = params.get('tab');
       if (tab === 'admin') {
         setActiveTab('admin');
+      } else if (tab === 'recipient') {
+        setActiveTab('recipient');
       }
     }
   }, []);
@@ -102,7 +104,7 @@ export default function LoginPage() {
           setError('Access Denied: You do not have administrator privileges.');
         }
       } else {
-        // Regular donor login
+        // Regular donor/recipient login
         await signInWithEmailAndPassword(auth, formData.email, formData.password);
         
         // Check if the user is actually an admin and redirect accordingly
@@ -141,23 +143,30 @@ export default function LoginPage() {
               className={`${styles.tab} ${activeTab === 'donor' ? styles.activeTab : ''}`}
               onClick={() => { setActiveTab('donor'); setError(''); }}
             >
-              Donor Sign In
+              Donor
+            </button>
+            <button
+              type="button"
+              className={`${styles.tab} ${activeTab === 'recipient' ? styles.activeTab : ''}`}
+              onClick={() => { setActiveTab('recipient'); setError(''); }}
+            >
+              Recipient
             </button>
             <button
               type="button"
               className={`${styles.tab} ${activeTab === 'admin' ? styles.activeTab : ''}`}
               onClick={() => { setActiveTab('admin'); setError(''); }}
             >
-              Admin Portal
+              Admin
             </button>
           </div>
 
           <div className={styles.header}>
             <h1 className={styles.title}>
-              {activeTab === 'admin' ? 'Admin Portal' : 'Welcome Back'}
+              {activeTab === 'admin' ? 'Admin Portal' : activeTab === 'recipient' ? 'Recipient Portal' : 'Welcome Back'}
             </h1>
             <p className={styles.subtitle}>
-              {activeTab === 'admin' ? 'Sign in as system administrator' : 'Sign in to your donor account'}
+              {activeTab === 'admin' ? 'Sign in as system administrator' : activeTab === 'recipient' ? 'Sign in to request blood details' : 'Sign in to your donor account'}
             </p>
           </div>
 
@@ -217,6 +226,13 @@ export default function LoginPage() {
           <div className={styles.footer}>
             {activeTab === 'admin' ? (
               <span>Looking for donor dashboard? <a href="#" onClick={(e) => { e.preventDefault(); setActiveTab('donor'); }} className={styles.link}>Donor Sign In</a></span>
+            ) : activeTab === 'recipient' ? (
+              <>
+                Don't have an account?{' '}
+                <Link href="/register?tab=recipient" className={styles.link}>
+                  Register as Recipient
+                </Link>
+              </>
             ) : (
               <>
                 Don't have an account?{' '}

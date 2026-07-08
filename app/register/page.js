@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { createUserWithEmailAndPassword } from 'firebase/auth';
 import { doc, setDoc } from 'firebase/firestore';
@@ -15,7 +15,18 @@ import styles from './page.module.css';
 
 export default function RegisterPage() {
   const router = useRouter();
+  const [activeTab, setActiveTab] = useState('donor'); // 'donor' or 'recipient'
   
+  useEffect(() => {
+    if (typeof window !== 'undefined') {
+      const params = new URLSearchParams(window.location.search);
+      const tab = params.get('tab');
+      if (tab === 'recipient') {
+        setActiveTab('recipient');
+      }
+    }
+  }, []);
+
   const [formData, setFormData] = useState({
     name: '',
     email: '',
@@ -105,72 +116,84 @@ export default function RegisterPage() {
     e.preventDefault();
     setError('');
     
-    if (!formData.division || !formData.district || !formData.area) {
+    if (activeTab === 'donor' && (!formData.division || !formData.district || !formData.area)) {
       setError('Please select division, district, and area.');
       return;
     }
 
     setLoading(true);
 
-    // Calculate final areas array
-    let finalAreas = [];
-    if (availabilityOption === 'primary') {
-      finalAreas = [formData.area];
-    } else if (availabilityOption === 'all_district') {
-      finalAreas = areasList;
-    } else {
-      // Filter unique areas, ensuring primary area is always present
-      finalAreas = Array.from(new Set([formData.area, ...selectedAreas])).filter(Boolean);
-    }
-
     try {
       // 1. Create user in Firebase Auth
       const userCredential = await createUserWithEmailAndPassword(auth, formData.email, formData.password);
       const user = userCredential.user;
 
-      // Calculate availability based on last donation date (if provided)
-      const eligible = isDonorEligible(formData.lastDonation);
-
-      // 2. Save donor profile in Firestore
-      await setDoc(doc(db, 'donors', user.uid), {
-        name: formData.name,
-        email: formData.email,
-        phone: formData.phone,
-        bloodGroup: formData.bloodGroup,
-        division: formData.division,
-        district: formData.district,
-        area: formData.area,           // Primary residential area (string)
-        areas: finalAreas,             // Areas where donor is available (array)
-        availableAllAreas: availabilityOption === 'all_district',
-        available: eligible,           // Mark unavailable if ineligible
-        totalDonations: formData.lastDonation ? 1 : 0,
-        lastDonation: formData.lastDonation || null,
-        gender: formData.gender,
-        university: formData.university || '',
-        createdAt: new Date()
-      });
-
-      // 3. Backup data to Google Sheets via our API route
-      try {
-        await fetch('/api/sheets', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({
-            name: formData.name,
-            email: formData.email,
-            phone: formData.phone,
-            bloodGroup: formData.bloodGroup,
-            division: formData.division,
-            district: formData.district,
-            area: formData.area,
-            areas: finalAreas.join(', '),
-            lastDonation: formData.lastDonation || 'N/A',
-            gender: formData.gender,
-            university: formData.university || 'N/A'
-          }),
+      if (activeTab === 'recipient') {
+        // 2. Save recipient profile in Firestore
+        await setDoc(doc(db, 'donors', user.uid), {
+          name: formData.name,
+          email: formData.email,
+          phone: formData.phone,
+          role: 'recipient',
+          available: false,
+          createdAt: new Date()
         });
-      } catch (sheetErr) {
-        console.error('Failed to sync to Google Sheets:', sheetErr);
+      } else {
+        // Calculate final areas array
+        let finalAreas = [];
+        if (availabilityOption === 'primary') {
+          finalAreas = [formData.area];
+        } else if (availabilityOption === 'all_district') {
+          finalAreas = areasList;
+        } else {
+          // Filter unique areas, ensuring primary area is always present
+          finalAreas = Array.from(new Set([formData.area, ...selectedAreas])).filter(Boolean);
+        }
+
+        // Calculate availability based on last donation date (if provided)
+        const eligible = isDonorEligible(formData.lastDonation);
+
+        // 2. Save donor profile in Firestore
+        await setDoc(doc(db, 'donors', user.uid), {
+          name: formData.name,
+          email: formData.email,
+          phone: formData.phone,
+          bloodGroup: formData.bloodGroup,
+          division: formData.division,
+          district: formData.district,
+          area: formData.area,           // Primary residential area (string)
+          areas: finalAreas,             // Areas where donor is available (array)
+          availableAllAreas: availabilityOption === 'all_district',
+          available: eligible,           // Mark unavailable if ineligible
+          totalDonations: formData.lastDonation ? 1 : 0,
+          lastDonation: formData.lastDonation || null,
+          gender: formData.gender,
+          university: formData.university || '',
+          createdAt: new Date()
+        });
+
+        // 3. Backup data to Google Sheets via our API route
+        try {
+          await fetch('/api/sheets', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+              name: formData.name,
+              email: formData.email,
+              phone: formData.phone,
+              bloodGroup: formData.bloodGroup,
+              division: formData.division,
+              district: formData.district,
+              area: formData.area,
+              areas: finalAreas.join(', '),
+              lastDonation: formData.lastDonation || 'N/A',
+              gender: formData.gender,
+              university: formData.university || 'N/A'
+            }),
+          });
+        } catch (sheetErr) {
+          console.error('Failed to sync to Google Sheets:', sheetErr);
+        }
       }
 
       // 4. Redirect to dashboard
@@ -195,9 +218,31 @@ export default function RegisterPage() {
       
       <main className={styles.main}>
         <div className={styles.card}>
+          {/* Tab navigation */}
+          <div className={styles.tabs}>
+            <button
+              type="button"
+              className={`${styles.tab} ${activeTab === 'donor' ? styles.activeTab : ''}`}
+              onClick={() => { setActiveTab('donor'); setError(''); }}
+            >
+              Register as Donor
+            </button>
+            <button
+              type="button"
+              className={`${styles.tab} ${activeTab === 'recipient' ? styles.activeTab : ''}`}
+              onClick={() => { setActiveTab('recipient'); setError(''); }}
+            >
+              Register as Recipient
+            </button>
+          </div>
+
           <div className={styles.header}>
-            <h1 className={styles.title}>Become a Donor</h1>
-            <p className={styles.subtitle}>Join our community and save lives</p>
+            <h1 className={styles.title}>
+              {activeTab === 'recipient' ? 'Register to Request Blood' : 'Become a Donor'}
+            </h1>
+            <p className={styles.subtitle}>
+              {activeTab === 'recipient' ? 'Create an account to submit and track blood requests' : 'Join our community and save lives'}
+            </p>
           </div>
 
           {error && <div className={styles.error}>{error}</div>}
@@ -260,177 +305,184 @@ export default function RegisterPage() {
               />
             </div>
 
-            <div className={styles.inputGroup}>
-              <label htmlFor="bloodGroup" className={styles.label}>Blood Group *</label>
-              <select
-                id="bloodGroup"
-                name="bloodGroup"
-                className={styles.select}
-                value={formData.bloodGroup}
-                onChange={handleChange}
-                required
-              >
-                <option value="" disabled>Select Blood Group</option>
-                {BLOOD_GROUPS.map((bg) => (
-                  <option key={bg} value={bg}>{bg}</option>
-                ))}
-              </select>
-            </div>
-
-            <div className={styles.row}>
-              <div className={styles.inputGroup}>
-                <label htmlFor="gender" className={styles.label}>Gender *</label>
-                <select
-                  id="gender"
-                  name="gender"
-                  className={styles.select}
-                  value={formData.gender}
-                  onChange={handleChange}
-                  required
-                >
-                  <option value="" disabled>Select Gender</option>
-                  <option value="Male">Male</option>
-                  <option value="Female">Female</option>
-                  <option value="Other">Other</option>
-                </select>
-              </div>
-
-              <div className={styles.inputGroup}>
-                <label htmlFor="university" className={styles.label}>University (Optional)</label>
-                <input
-                  type="text"
-                  id="university"
-                  name="university"
-                  className={styles.input}
-                  placeholder="e.g. Dhaka University"
-                  value={formData.university}
-                  onChange={handleChange}
-                />
-              </div>
-            </div>
-
-            <div className={styles.inputGroup}>
-              <label htmlFor="lastDonation" className={styles.label}>Last Donation Date (Optional)</label>
-              <input
-                type="date"
-                id="lastDonation"
-                name="lastDonation"
-                className={styles.input}
-                value={formData.lastDonation}
-                onChange={handleChange}
-                max={new Date().toISOString().split('T')[0]}
-              />
-              <p className={styles.helpText}>
-                Leave empty if you have never donated before. We use this to check your availability/eligibility status.
-              </p>
-            </div>
-
-            {/* Bangladesh Division & District Selection */}
-            <div className={styles.row}>
-              <div className={styles.inputGroup}>
-                <label htmlFor="division" className={styles.label}>Division *</label>
-                <select
-                  id="division"
-                  name="division"
-                  className={styles.select}
-                  value={formData.division}
-                  onChange={handleDivisionChange}
-                  required
-                >
-                  <option value="" disabled>Select Division</option>
-                  {Object.keys(BANGLADESH_DATA).map((div) => (
-                    <option key={div} value={div}>{div}</option>
-                  ))}
-                </select>
-              </div>
-
-              <div className={styles.inputGroup}>
-                <label htmlFor="district" className={styles.label}>District *</label>
-                <select
-                  id="district"
-                  name="district"
-                  className={styles.select}
-                  value={formData.district}
-                  onChange={handleDistrictChange}
-                  disabled={!formData.division}
-                  required
-                >
-                  <option value="" disabled>Select District</option>
-                  {districtsList.map((dist) => (
-                    <option key={dist} value={dist}>{dist}</option>
-                  ))}
-                </select>
-              </div>
-            </div>
-
-            <div className={styles.inputGroup}>
-              <label htmlFor="area" className={styles.label}>Primary Residential Area *</label>
-              <select
-                id="area"
-                name="area"
-                className={styles.select}
-                value={formData.area}
-                onChange={handleAreaChange}
-                disabled={!formData.district}
-                required
-              >
-                <option value="" disabled>Select Area</option>
-                {areasList.map((area) => (
-                  <option key={area} value={area}>{area}</option>
-                ))}
-              </select>
-            </div>
-
-            {/* Multiple Areas of Availability */}
-            {formData.area && (
-              <div className={styles.availabilitySection}>
-                <label className={styles.label}>Areas of Availability to Donate</label>
-                <div className={styles.radioGroup}>
-                  <label className={styles.radioLabel}>
-                    <input
-                      type="radio"
-                      name="availabilityOption"
-                      checked={availabilityOption === 'primary'}
-                      onChange={() => handleAvailabilityOptionChange('primary')}
-                    />
-                    <span>My primary area only ({formData.area})</span>
-                  </label>
-                  <label className={styles.radioLabel}>
-                    <input
-                      type="radio"
-                      name="availabilityOption"
-                      checked={availabilityOption === 'all_district'}
-                      onChange={() => handleAvailabilityOptionChange('all_district')}
-                    />
-                    <span>Available in all areas in {formData.district} district</span>
-                  </label>
-                  <label className={styles.radioLabel}>
-                    <input
-                      type="radio"
-                      name="availabilityOption"
-                      checked={availabilityOption === 'multiple'}
-                      onChange={() => handleAvailabilityOptionChange('multiple')}
-                    />
-                    <span>Select specific areas (multiple)</span>
-                  </label>
+                {activeTab === 'donor' && (
+              <>
+                <div className={styles.inputGroup}>
+                  <label htmlFor="bloodGroup" className={styles.label}>Blood Group *</label>
+                  <select
+                    id="bloodGroup"
+                    name="bloodGroup"
+                    className={styles.select}
+                    value={formData.bloodGroup}
+                    onChange={handleChange}
+                    required
+                  >
+                    <option value="" disabled>Select Blood Group</option>
+                    {BLOOD_GROUPS.map((bg) => (
+                      <option key={bg} value={bg}>{bg}</option>
+                    ))}
+                  </select>
                 </div>
 
-                {availabilityOption === 'multiple' && areasList.length > 0 && (
-                  <div className={styles.checkboxGrid}>
-                    {areasList.map((a) => (
-                      <label key={a} className={styles.checkboxLabel}>
-                        <input
-                          type="checkbox"
-                          checked={selectedAreas.includes(a) || a === formData.area}
-                          onChange={(e) => handleAreaCheckboxChange(a, e.target.checked)}
-                          disabled={a === formData.area} // Primary area is always included
-                        />
-                        <span>{a}</span>
-                      </label>
+                <div className={styles.row}>
+                  <div className={styles.inputGroup}>
+                    <label htmlFor="gender" className={styles.label}>Gender *</label>
+                    <select
+                      id="gender"
+                      name="gender"
+                      className={styles.select}
+                      value={formData.gender}
+                      onChange={handleChange}
+                      required
+                    >
+                      <option value="" disabled>Select Gender</option>
+                      <option value="Male">Male</option>
+                      <option value="Female">Female</option>
+                      <option value="Other">Other</option>
+                    </select>
+                  </div>
+
+                  <div className={styles.inputGroup}>
+                    <label htmlFor="university" className={styles.label}>University (Optional)</label>
+                    <input
+                      type="text"
+                      id="university"
+                      name="university"
+                      className={styles.input}
+                      placeholder="e.g. Dhaka University"
+                      value={formData.university}
+                      onChange={handleChange}
+                    />
+                  </div>
+                </div>
+
+                <div className={styles.inputGroup}>
+                  <label htmlFor="lastDonation" className={styles.label}>Last Donation Date (Optional)</label>
+                  <input
+                    type="date"
+                    id="lastDonation"
+                    name="lastDonation"
+                    className={styles.input}
+                    value={formData.lastDonation}
+                    onChange={handleChange}
+                    max={new Date().toISOString().split('T')[0]}
+                  />
+                  <p className={styles.helpText}>
+                    Leave empty if you have never donated before. We use this to check your availability/eligibility status.
+                  </p>
+                </div>
+
+                {/* Bangladesh Division & District Selection */}
+                <div className={styles.row}>
+                  <div className={styles.inputGroup}>
+                    <label htmlFor="division" className={styles.label}>Division *</label>
+                    <select
+                      id="division"
+                      name="division"
+                      className={styles.select}
+                      value={formData.division}
+                      onChange={handleDivisionChange}
+                      required
+                    >
+                      <option value="" disabled>Select Division</option>
+                      {Object.keys(BANGLADESH_DATA).map((div) => (
+                        <option key={div} value={div}>{div}</option>
+                      ))}
+                    </select>
+                  </div>
+
+                  <div className={styles.inputGroup}>
+                    <label htmlFor="district" className={styles.label}>District *</label>
+                    <select
+                      id="district"
+                      name="district"
+                      className={styles.select}
+                      value={formData.district}
+                      onChange={handleDistrictChange}
+                      disabled={!formData.division}
+                      required
+                    >
+                      <option value="" disabled>Select District</option>
+                      {districtsList.map((dist) => (
+                        <option key={dist} value={dist}>{dist}</option>
+                      ))}
+                    </select>
+                  </div>
+                </div>
+
+                <div className={styles.inputGroup}>
+                  <label htmlFor="area" className={styles.label}>Primary Residential Area *</label>
+                  <select
+                    id="area"
+                    name="area"
+                    className={styles.select}
+                    value={formData.area}
+                    onChange={handleAreaChange}
+                    disabled={!formData.district}
+                    required
+                  >
+                    <option value="" disabled>Select Area</option>
+                    {areasList.map((ar) => (
+                      <option key={ar} value={ar}>{ar}</option>
                     ))}
+                  </select>
+                  <p className={styles.helpText}>
+                    Select your main neighborhood.
+                  </p>
+                </div>
+
+                {/* Availability configuration */}
+                {formData.area && areasList.length > 0 && (
+                  <div className={styles.availabilityConfig}>
+                    <label className={styles.label}>Availability Coverage Area</label>
+                    <div className={styles.radioGroup}>
+                      <label className={styles.radioLabel}>
+                        <input
+                          type="radio"
+                          name="availabilityOption"
+                          checked={availabilityOption === 'primary'}
+                          onChange={() => handleAvailabilityOptionChange('primary')}
+                        />
+                        <span>Only {formData.area} (primary area)</span>
+                      </label>
+                      <label className={styles.radioLabel}>
+                        <input
+                          type="radio"
+                          name="availabilityOption"
+                          checked={availabilityOption === 'all_district'}
+                          onChange={() => handleAvailabilityOptionChange('all_district')}
+                        />
+                        <span>Available in all areas in {formData.district} district</span>
+                      </label>
+                      <label className={styles.radioLabel}>
+                        <input
+                          type="radio"
+                          name="availabilityOption"
+                          checked={availabilityOption === 'multiple'}
+                          onChange={() => handleAvailabilityOptionChange('multiple')}
+                        />
+                        <span>Select specific areas (multiple)</span>
+                      </label>
+                    </div>
+
+                    {availabilityOption === 'multiple' && areasList.length > 0 && (
+                      <div className={styles.checkboxGrid}>
+                        {areasList.map((a) => (
+                          <label key={a} className={styles.checkboxLabel}>
+                            <input
+                              type="checkbox"
+                              checked={selectedAreas.includes(a) || a === formData.area}
+                              onChange={(e) => handleAreaCheckboxChange(a, e.target.checked)}
+                              disabled={a === formData.area} // Primary area is always included
+                            />
+                            <span>{a}</span>
+                          </label>
+                        ))}
+                      </div>
+                    )}
                   </div>
                 )}
-              </div>
+              </>
             )}
 
             <button 
@@ -438,13 +490,13 @@ export default function RegisterPage() {
               className={styles.submitBtn}
               disabled={loading}
             >
-              {loading ? <div className={styles.spinner}></div> : 'Register as Donor'}
+              {loading ? <div className={styles.spinner}></div> : activeTab === 'recipient' ? 'Register as Recipient' : 'Register as Donor'}
             </button>
           </form>
 
           <div className={styles.footer}>
             Already have an account?{' '}
-            <Link href="/login" className={styles.link}>
+            <Link href={activeTab === 'recipient' ? '/login?tab=recipient' : '/login'} className={styles.link}>
               Sign In
             </Link>
           </div>
