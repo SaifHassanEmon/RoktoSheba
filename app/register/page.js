@@ -31,6 +31,7 @@ export default function RegisterPage() {
     name: '',
     email: '',
     password: '',
+    confirmPassword: '',
     phone: '',
     bloodGroup: '',
     division: '',
@@ -115,6 +116,11 @@ export default function RegisterPage() {
   const handleSubmit = async (e) => {
     e.preventDefault();
     setError('');
+
+    if (formData.password !== formData.confirmPassword) {
+      setError('Passwords do not match.');
+      return;
+    }
     
     if (activeTab === 'donor' && (!formData.division || !formData.district || !formData.area)) {
       setError('Please select division, district, and area.');
@@ -263,6 +269,20 @@ export default function RegisterPage() {
             </div>
 
             <div className={styles.inputGroup}>
+              <label htmlFor="phone" className={styles.label}>Phone Number *</label>
+              <input
+                type="tel"
+                id="phone"
+                name="phone"
+                className={styles.input}
+                placeholder="+880 1XXX XXXXXX"
+                value={formData.phone}
+                onChange={handleChange}
+                required
+              />
+            </div>
+
+            <div className={styles.inputGroup}>
               <label htmlFor="email" className={styles.label}>Email Address *</label>
               <input
                 type="email"
@@ -292,16 +312,17 @@ export default function RegisterPage() {
             </div>
 
             <div className={styles.inputGroup}>
-              <label htmlFor="phone" className={styles.label}>Phone Number *</label>
+              <label htmlFor="confirmPassword" className={styles.label}>Confirm Password *</label>
               <input
-                type="tel"
-                id="phone"
-                name="phone"
+                type="password"
+                id="confirmPassword"
+                name="confirmPassword"
                 className={styles.input}
-                placeholder="+880 1XXX XXXXXX"
-                value={formData.phone}
+                placeholder="••••••••"
+                value={formData.confirmPassword}
                 onChange={handleChange}
                 required
+                minLength={6}
               />
             </div>
 
