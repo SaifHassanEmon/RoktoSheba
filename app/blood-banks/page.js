@@ -26,6 +26,7 @@ export default function BloodBanksPage() {
   const [geoLoading, setGeoLoading] = useState(false);
   const [geoError, setGeoError] = useState('');
   const [geoSuccess, setGeoSuccess] = useState(false);
+  const [limitTo20km, setLimitTo20km] = useState(true);
 
   // Filters State
   const [division, setDivision] = useState('');
@@ -82,10 +83,11 @@ export default function BloodBanksPage() {
     );
   };
 
-  // Filter list of blood banks based on dropdown selects
+  // Filter list of blood banks based on dropdown selects and proximity
   const filteredBanks = banks.filter(bank => {
     if (division && bank.division !== division) return false;
     if (district && bank.district !== district) return false;
+    if (userLocation && limitTo20km && bank.distance !== undefined && bank.distance > 20) return false;
     return true;
   });
 
@@ -133,7 +135,18 @@ export default function BloodBanksPage() {
           {/* Geolocation Feedback Message */}
           {geoSuccess && (
             <div className={`${styles.alert} ${styles.alertSuccess}`}>
-              ✅ Location retrieved successfully! Blood banks are now sorted by distance from your current coordinates.
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '1rem', width: '100%' }}>
+                <span>✅ Location retrieved successfully! Blood banks are now sorted by distance from your current coordinates.</span>
+                <label style={{ display: 'inline-flex', alignItems: 'center', gap: '0.5rem', cursor: 'pointer', fontSize: '0.9rem', fontWeight: '600' }}>
+                  <input
+                    type="checkbox"
+                    checked={limitTo20km}
+                    onChange={(e) => setLimitTo20km(e.target.checked)}
+                    style={{ cursor: 'pointer', width: '16px', height: '16px' }}
+                  />
+                  <span>Suggest only within 20 km</span>
+                </label>
+              </div>
             </div>
           )}
           {geoError && (
