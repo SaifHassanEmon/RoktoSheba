@@ -122,10 +122,10 @@ export default function RequestBloodModal({ donor, onClose }) {
               <div className={styles.loginRequired}>
                 <p>You need to be logged in to request blood details.</p>
                 <div className={styles.loginActions}>
-                  <Link href="/login" className="btn btn-primary" onClick={onClose}>
+                  <Link href="/login?tab=recipient" className="btn btn-primary" onClick={onClose}>
                     Login
                   </Link>
-                  <Link href="/register" className="btn btn-secondary" onClick={onClose}>
+                  <Link href="/register?tab=recipient" className="btn btn-secondary" onClick={onClose}>
                     Register
                   </Link>
                 </div>
